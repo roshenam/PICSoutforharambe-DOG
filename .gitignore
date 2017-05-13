@@ -5,4 +5,10 @@
 /Outputs/*.o
 /Outputs/*.crf
 /Outputs/*.d
+/Outputs/*.axf
+/Outputs/*.lnp
+/Outputs/*.map
+/Outputs/BaseTarget.htm
+/Outputs/*.bin
+/*.dep
 
