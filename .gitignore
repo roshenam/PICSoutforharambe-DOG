@@ -1,4 +1,8 @@
-/bin*
+/*bin
 *.scvd
-/proj/*.uvgui*
-/proj/*.uvopt
+/*.uvgui*
+/*.uvopt
+/Outputs/*.o
+/Outputs/*.crf
+/Outputs/*.d
+
