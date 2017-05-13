@@ -1,14 +1,15 @@
 /*bin
 *.scvd
 /*.uvgui*
-/*.uvopt
+/*.uvopt*
+/*.bak
 /Outputs/*.o
 /Outputs/*.crf
 /Outputs/*.d
 /Outputs/*.axf
 /Outputs/*.lnp
 /Outputs/*.map
-/Outputs/BaseTarget.htm
+/Outputs/*.htm
 /Outputs/*.bin
 /*.dep
 
