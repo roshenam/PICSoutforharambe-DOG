@@ -42,7 +42,7 @@ static uint8_t CheckSum = 0;
 static uint8_t DataPacket[MAX_FRAME_LENGTH]; // array containing all bytes in data packet
 static uint8_t ArrayIndex = 0;
 
-static uint8_t *outgoingDataPacket = &DataPacket[0]; // address of first entry in data packet array
+static uint8_t *outgoingDataPacket; // = &DataPacket[0]; // address of first entry in data packet array
 
 
 
@@ -137,6 +137,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
             // initialize UART
 						InitUART();
 
+						outgoingDataPacket = &DataPacket[0];
+					
             // set current state to Wait4Start 
             CurrentState = Wait4Start;
          }
