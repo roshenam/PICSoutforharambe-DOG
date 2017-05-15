@@ -37,14 +37,15 @@
 
 /*------------------------------ Module Code ------------------------------*/
 
-void ActivateHover() {
-  //Tx to PIC
+void ActivateHover(void) {
+  SetOutput(LIFT_FAN_PORT, LIFT_FAN_PIN, HI);
 }
 
-void DeactivateHover() {
-  //Tx to PIC
+void DeactivateHover(void) {
+  SetOutput(LIFT_FAN_PORT, LIFT_FAN_PIN, LO);
 }
 
+/*
 void TurnLeft() {
 }
 
@@ -52,7 +53,7 @@ void TurnRight() {
 }
 
 void ChangeSpeed() {
-}
+} */
  
 
 

@@ -38,10 +38,14 @@
 #include "Receive_SM.h"
 #include "DOG_SM.h"
 #include "IMU_Service.h"
+#include "HoverControl_Module.h"
+#include "Constants.h"
+#include "Comm_Service.h"
 
 /********************Module Defines*******************************************/
 //Port A
-
+#define LIFT_FAN_PORT	GPIO_PORTA_BASE
+#define LIFT_FAN_PIN	GPIO_PIN_2
 
 //Port B
 

@@ -80,11 +80,11 @@
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public function prototypes
-#define SERV_3_HEADER "TestHarnessService3.h"
+#define SERV_3_HEADER "Comm_Service.h"
 // the name of the Init function
-#define SERV_3_INIT InitTestHarnessService3
+#define SERV_3_INIT InitComm_Service
 // the name of the run function
-#define SERV_3_RUN RunTestHarnessService3
+#define SERV_3_RUN RunComm_Service
 // How big should this services Queue be?
 #define SERV_3_QUEUE_SIZE 3
 #endif
@@ -258,10 +258,11 @@ typedef enum {  ES_NO_EVENT = 0,
                 ES_NEW_KEY, /* signals a new key received from terminal */
                 ES_LOCK,
                 ES_UNLOCK,
-								ES_BYTE_RECEIVED, //ES_DATAPACKET_RECEIVED, //ReceiveSM
+								ES_BYTE_RECEIVED, ES_DATAPACKET_RECEIVED, //ReceiveSM
 								//DOG_SM
 								ES_PAIR_REQUEST_RECEIVED, ES_ENCRYPTION_KEY_RECEIVED,
-								ES_NEW_CMD_RECEIVED, ES_ENCRYPTION_COUNTER_INCORRECT
+								ES_NEW_CMD_RECEIVED, ES_ENCRYPTION_COUNTER_INCORRECT,
+								ES_CONSTRUCT_DOG_ACK, ES_SEND_DOG_ACK
 } ES_EventTyp_t ;
 
 /****************************************************************************/
@@ -309,8 +310,8 @@ typedef enum {  ES_NO_EVENT = 0,
 // Unlike services, any combination of timers may be used and there is no
 // priority in servicing them
 #define TIMER_UNUSED ((pPostFunc)0)
-#define TIMER0_RESP_FUNC RECEIVE_TIMER
-#define TIMER1_RESP_FUNC GameTimer
+#define TIMER0_RESP_FUNC PostReceive_SM
+#define TIMER1_RESP_FUNC PostDOG_SM
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
 #define TIMER4_RESP_FUNC TIMER_UNUSED

@@ -40,25 +40,30 @@
 #define FRAME_ID                  0x02
 #define API_IDENTIFIER_Tx         0x01
 #define API_IDENTIFIER_Rx         0x81
+#define API_IDENTIFIER_Tx_Result  0x89
 #define MAX_FRAME_LENGTH          40
+#define START_DELIMITER 					0x7E
 
 #define PAIR_ACK_FRAME_LENGTH     6
 
 //Tx Packet
-#define API_IDENT_BYTE_INDEX      0
-#define FRAME_ID_BYTE_INDEX       1
-#define DEST_ADDRESS_MSB_INDEX    2
-#define DEST_ADDRESS_LSB_INDEX    3
-#define OPTIONS_BYTE_INDEX        4
-#define PACKET_TYPE_BYTE_INDEX    5 
+#define START_BYTE_INDEX					0
+#define LENGTH_MSB_BYTE_INDEX			1
+#define LENGTH_LSB_BYTE_INDEX			2
+#define API_IDENT_BYTE_INDEX_TX   3
+#define FRAME_ID_BYTE_INDEX       4
+#define DEST_ADDRESS_MSB_INDEX    5
+#define DEST_ADDRESS_LSB_INDEX    6
+#define OPTIONS_BYTE_INDEX_TX     7
+#define PACKET_TYPE_BYTE_INDEX_TX 8 
 
 //Rx Packet
-//API IDENTIFIER 0
+#define API_IDENT_BYTE_INDEX_RX   0
 #define SOURCE_ADDRESS_MSB_INDEX  1
 #define SOURCE_ADDRESS_LSB_INDEX  2
 #define RSSI_BYTE_INDEX           3 
-//OPTIONS 4
-//PACKET TYPE 5
+#define OPTIONS_BYTE_INDEX_RX			4
+#define PACKET_TYPE_BYTE_INDEX_RX	5
 #define DOG_TAG_BYTE_INDEX        6   
 
 
