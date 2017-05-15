@@ -25,7 +25,8 @@
 
 
 /*---------------------------- Module Functions ---------------------------*/
-
+uint8_t GetPairedFarmerLSB(void);
+uint8_t GetPairedFarmerMSB(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t MyPriority;

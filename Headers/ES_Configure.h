@@ -258,11 +258,11 @@ typedef enum {  ES_NO_EVENT = 0,
                 ES_NEW_KEY, /* signals a new key received from terminal */
                 ES_LOCK,
                 ES_UNLOCK,
-								ES_BYTE_RECEIVED, //ES_DATAPACKET_RECEIVED, //ReceiveSM
+								ES_BYTE_RECEIVED, ES_DATAPACKET_RECEIVED, //ReceiveSM
 								//DOG_SM
 								ES_PAIR_REQUEST_RECEIVED, ES_ENCRYPTION_KEY_RECEIVED,
 								ES_NEW_CMD_RECEIVED, ES_ENCRYPTION_COUNTER_INCORRECT, 
-								ES_CONSTRUCT_DOG_ACK,
+								ES_CONSTRUCT_DOG_ACK, ES_SEND_DOG_ACK,
 								//Transmit_SM
 								ES_START_XMIT, ES_BYTE_SENT
 } ES_EventTyp_t ;
