@@ -30,6 +30,8 @@
 
 #include "Constants.h"
 #include "Hardware.h"
+#include "Transmit_SM.h"
+#include "Receive_SM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 //#define RX_PIN	BIT0HI 	// UART7 Rx: PE0
@@ -143,19 +145,17 @@ void InitUART(void) {
 		// clear interrupt flag 
 		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_TXIC;
 
-		/*// call SendByte in Transmit_SM
-		SendByte(); 
-
 		// if this was last byte in message block
-		if (isLastByte()) { // isLastByte from Transmit_SM
+		if (IsLastByte()) { // isLastByte from Transmit_SM
 			// disable TXIM 
 			HWREG(UART7_BASE + UART_O_IM) &= ~UART_IM_TXIM;
 		}
-		*/		
+		
 	}
 }
 
- 
+
+
 
 
 

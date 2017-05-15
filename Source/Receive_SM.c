@@ -139,6 +139,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
             // initialize UART
 						InitUART();
 
+						outgoingDataPacket = &DataPacket[0];
+					
             // set current state to Wait4Start 
             CurrentState = Wait4Start;
          }
