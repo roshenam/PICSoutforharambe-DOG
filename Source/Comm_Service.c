@@ -141,7 +141,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
 					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00;
 					DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = PAIR_ACK_FRAME_LENGTH;
-				  DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
+					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
 					uint8_t PairedFarmer_MSB = GetPairedFarmerMSB();
 					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = PairedFarmer_MSB;
@@ -149,6 +149,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = PairedFarmer_LSB;
 					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = 0x00;
 					DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_IDENTIFICATION;
+
 					ES_Event NewEvent;
 					NewEvent.EventType = ES_SEND_DOG_ACK;
 					NewEvent.EventParam = &DataPacket_Tx[0]; //param is pointer to data packet

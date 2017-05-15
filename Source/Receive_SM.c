@@ -19,7 +19,7 @@
 #include "Constants.h"
 
 /*----------------------------- Module Defines ----------------------------*/
-#define START_DELIMITER 0x7E
+
 #define RECEIVE_TIMER_LENGTH 10 // based off of 9600 baud rate (each character takes ~1.04ms to send)
 
 #define MAX_FRAME_LENGTH 40 // max number of bytes we expect to receive for any data type 
@@ -42,7 +42,7 @@ static uint8_t CheckSum = 0;
 static uint8_t DataPacket[MAX_FRAME_LENGTH]; // array containing all bytes in data packet
 static uint8_t ArrayIndex = 0;
 
-static uint8_t *outgoingDataPacket; // = &DataPacket[0]; // address of first entry in data packet array
+static uint8_t *outgoingDataPacket; //pointer to data packet
 
 
 
@@ -72,6 +72,8 @@ bool InitReceive_SM ( uint8_t Priority )
   MyPriority = Priority;
   // put us into the Initial PseudoState
   CurrentState = InitReceive;
+	
+	outgoingDataPacket = &DataPacket[0]; // address of first entry in data packet array
 	
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
@@ -216,26 +218,10 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				if (BytesLeft == 0) {
 					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
 						// if good checksum, post PacketReceived event to FARMER_SM
-						ES_Event ThisEvent;
-						uint8_t PacketType = DataPacket[PACKET_TYPE_BYTE_INDEX_RX];
-						switch (PacketType) {
-							case FARMER_DOG_REQ_2_PAIR :
-								ThisEvent.EventType = ES_PAIR_REQUEST_RECEIVED;
-								break;
-							case FARMER_DOG_ENCR_KEY :
-								ThisEvent.EventType = ES_ENCRYPTION_KEY_RECEIVED;
-								break;
-							case FARMER_DOG_CTRL :
-								ThisEvent.EventType = ES_NEW_CMD_RECEIVED;
-								break;
-							case FARMER_DOG_RESET_ENCR :
-                ThisEvent.EventType = ES_ENCRYPTION_COUNTER_INCORRECT;
-								break;
-						}
-            
-						//ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
+						ES_Event ThisEvent;         
+						ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
 						ThisEvent.EventParam = FrameLength; 
-						PostDOG_SM(ThisEvent);
+						//PostComm_Service(ThisEvent);
 					} else {
 						// if bad checksum, don't do anything? 
 					}

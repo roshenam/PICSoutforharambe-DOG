@@ -80,11 +80,13 @@
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public function prototypes
+
 #define SERV_3_HEADER "Transmit_SM.h"
 // the name of the Init function
 #define SERV_3_INIT InitTransmit_SM
 // the name of the run function
 #define SERV_3_RUN RunTransmit_SM
+
 // How big should this services Queue be?
 #define SERV_3_QUEUE_SIZE 3
 #endif
@@ -265,6 +267,7 @@ typedef enum {  ES_NO_EVENT = 0,
 								ES_CONSTRUCT_DOG_ACK, ES_SEND_DOG_ACK,
 								//Transmit_SM
 								ES_START_XMIT, ES_BYTE_SENT
+
 } ES_EventTyp_t ;
 
 /****************************************************************************/
