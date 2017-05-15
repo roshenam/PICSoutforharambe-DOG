@@ -217,7 +217,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
 						// if good checksum, post PacketReceived event to FARMER_SM
 						ES_Event ThisEvent;
-						uint8_t PacketType = DataPacket[PACKET_TYPE_BYTE_INDEX];
+						uint8_t PacketType = DataPacket[PACKET_TYPE_BYTE_INDEX_RX];
 						switch (PacketType) {
 							case FARMER_DOG_REQ_2_PAIR :
 								ThisEvent.EventType = ES_PAIR_REQUEST_RECEIVED;

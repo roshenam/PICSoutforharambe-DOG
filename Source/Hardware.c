@@ -41,7 +41,7 @@
 void InitGPIOPins(void);
 void InitPorts(void);
 void InitInterrupts(void);
-
+void InitPWM(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 
@@ -78,6 +78,7 @@ void InitAll (void) {
 	InitPorts();
 	InitGPIOPins(); 
 	InitInterrupts();
+	InitPWM();
 	//etc....
 }
 
@@ -102,6 +103,8 @@ void InitPorts(void) {
 
 void InitGPIOPins(void) {
 
+	//Lift fan PA2
+	InitPin(LIFT_FAN_PORT, LIFT_FAN_PIN, LO);
 	//initialize pins
   
 }

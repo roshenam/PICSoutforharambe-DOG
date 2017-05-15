@@ -146,7 +146,7 @@ void InitUART(void) {
 		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_TXIC;
 
 		// if this was last byte in message block
-		if (isLastByte()) { // isLastByte from Transmit_SM
+		if (IsLastByte()) { // isLastByte from Transmit_SM
 			// disable TXIM 
 			HWREG(UART7_BASE + UART_O_IM) &= ~UART_IM_TXIM;
 		}
