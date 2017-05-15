@@ -31,6 +31,9 @@
 #include "driverlib/gpio.h"
 #include "ES_ShortTimer.h"
 
+#include "Hardware.h"
+#include "Constants.h"
+
 /*----------------------------- Module Defines ----------------------------*/
 // these times assume a 1.000mS/tick timing
 #define ONE_SEC 976

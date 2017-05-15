@@ -28,12 +28,12 @@
 #include "driverlib/pin_map.h"	// Define PART_TM4C123GH6PM in project
 #include "driverlib/gpio.h"
 
-#include "UART.h"
-#include "Receive_SM.h"
+#include "Constants.h"
+#include "Hardware.h"
 
 /*----------------------------- Module Defines ----------------------------*/
-#define RX_PIN	BIT0HI 	// UART7 Rx: PE0
-#define TX_PIN	BIT1HI	// UART7 Tx: PE1
+//#define RX_PIN	BIT0HI 	// UART7 Rx: PE0
+//#define TX_PIN	BIT1HI	// UART7 Tx: PE1
 
 #define ALL_BITS (0xff<<2)
 

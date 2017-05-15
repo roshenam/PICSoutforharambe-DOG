@@ -30,7 +30,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 2
+#define NUM_SERVICES 3
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -67,11 +67,11 @@
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public function prototypes
-#define SERV_2_HEADER "TestHarnessService2.h"
+#define SERV_2_HEADER "DOG_SM.h"
 // the name of the Init function
-#define SERV_2_INIT InitTestHarnessService2
+#define SERV_2_INIT InitDOG_SM
 // the name of the run function
-#define SERV_2_RUN RunTestHarnessService2
+#define SERV_2_RUN RunDOG_SM
 // How big should this services Queue be?
 #define SERV_2_QUEUE_SIZE 3
 #endif
@@ -258,7 +258,10 @@ typedef enum {  ES_NO_EVENT = 0,
                 ES_NEW_KEY, /* signals a new key received from terminal */
                 ES_LOCK,
                 ES_UNLOCK,
-								ES_BYTE_RECEIVED, ES_DATAPACKET_RECEIVED
+								ES_BYTE_RECEIVED, //ES_DATAPACKET_RECEIVED, //ReceiveSM
+								//DOG_SM
+								ES_PAIR_REQUEST_RECEIVED, ES_ENCRYPTION_KEY_RECEIVED,
+								ES_NEW_CMD_RECEIVED, ES_ENCRYPTION_COUNTER_INCORRECT
 } ES_EventTyp_t ;
 
 /****************************************************************************/
@@ -307,7 +310,7 @@ typedef enum {  ES_NO_EVENT = 0,
 // priority in servicing them
 #define TIMER_UNUSED ((pPostFunc)0)
 #define TIMER0_RESP_FUNC RECEIVE_TIMER
-#define TIMER1_RESP_FUNC TIMER_UNUSED
+#define TIMER1_RESP_FUNC GameTimer
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
 #define TIMER4_RESP_FUNC TIMER_UNUSED
@@ -331,6 +334,7 @@ typedef enum {  ES_NO_EVENT = 0,
 // These symbolic names should be changed to be relevant to your application 
 
 #define RECEIVE_TIMER 0
+#define GameTimer 1
 
 
 #endif /* CONFIGURE_H */

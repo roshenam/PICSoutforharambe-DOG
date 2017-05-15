@@ -15,8 +15,8 @@
 #include "ES_Framework.h"
 #include "ES_DeferRecall.h"
 
-#include "Receive_SM.h"
-#include "UART.h"
+#include "Hardware.h"
+#include "Constants.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define START_DELIMITER 0x7E
@@ -26,7 +26,7 @@
 
 
 /*---------------------------- Module Functions ---------------------------*/
-uint8_t* GetDataPacket(void);
+
 
 /*---------------------------- Module Variables ---------------------------*/
 static ReceiveState_t CurrentState;
@@ -43,6 +43,7 @@ static uint8_t DataPacket[MAX_FRAME_LENGTH]; // array containing all bytes in da
 static uint8_t ArrayIndex = 0;
 
 static uint8_t *outgoingDataPacket = &DataPacket[0]; // address of first entry in data packet array
+
 
 
 /*------------------------------ Module Code ------------------------------*/
@@ -211,12 +212,28 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
-					if (CheckSum == ThisEvent.EventParam) {
+					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
 						// if good checksum, post PacketReceived event to FARMER_SM
 						ES_Event ThisEvent;
-						ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
+						uint8_t PacketType = DataPacket[PACKET_TYPE_BYTE_INDEX];
+						switch (PacketType) {
+							case FARMER_DOG_REQ_2_PAIR :
+								ThisEvent.EventType = ES_PAIR_REQUEST_RECEIVED;
+								break;
+							case FARMER_DOG_ENCR_KEY :
+								ThisEvent.EventType = ES_ENCRYPTION_KEY_RECEIVED;
+								break;
+							case FARMER_DOG_CTRL :
+								ThisEvent.EventType = ES_NEW_CMD_RECEIVED;
+								break;
+							case FARMER_DOG_RESET_ENCR :
+                ThisEvent.EventType = ES_ENCRYPTION_COUNTER_INCORRECT;
+								break;
+						}
+            
+						//ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
 						ThisEvent.EventParam = FrameLength; 
-						//PostFARMER_SM(ThisEvent);
+						PostDOG_SM(ThisEvent);
 					} else {
 						// if bad checksum, don't do anything? 
 					}
@@ -270,3 +287,5 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 uint8_t* GetDataPacket(void) {
 	return outgoingDataPacket;
 }
+
+
