@@ -76,7 +76,7 @@ void InitUART(void) {
 	HWREG(GPIO_PORTE_BASE + GPIO_O_AFSEL) |= (RX_PIN | TX_PIN);
 	
 	// 7. Configure PMC0-1 fields in GPIOPCTL to assign the UART to PE0-1
-	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) = (HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xFFFFFF00) + (2<<(0*4)) + (2<<(1*4));
+	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) = (HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xFFFFFF00) + (1<<(0*4)) + (1<<(1*4));
 	
 	// 8. Disable UART (clear UARTEN bit in UARTCTL)
 	HWREG(UART7_BASE + UART_O_CTL) &= ~UART_CTL_UARTEN;
@@ -123,7 +123,7 @@ void InitUART(void) {
 	// read UARTMIS
     // if RXMIS set:
  	if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
-		printf("RXMIS INTERRUPT \n\r");
+		//printf("RXMIS INTERRUPT \n\r");
 		// save new data byte
 		DataByte = HWREG(UART7_BASE + UART_O_DR); 
 
@@ -140,7 +140,7 @@ void InitUART(void) {
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 
 	else if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_TXMIS) == UART_MIS_TXMIS) {
 	// should get this interrupt for all bytes AFTER the start byte (0x7E) 
-		printf("TXMIS INTERRUPT \n\r");
+		//printf("TXMIS INTERRUPT \n\r");
 		// clear interrupt flag 
 		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_TXIC;
 
