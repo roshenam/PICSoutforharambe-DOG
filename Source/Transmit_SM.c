@@ -157,12 +157,14 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
     case Idle:      
 			// waiting to receive Start_Xmit event from Comm_Service
 			if ( ThisEvent.EventType == ES_START_XMIT ) {
+				printf("Start Xmit Received: Transmit_SM \n\r");
 				// get length of array 
 				DataPacketLength = ThisEvent.EventParam; 
 				
 				// send first byte of array 
 				uint8_t CurrentByte = *(DataToSend+index);
 				SendByte(CurrentByte);
+				printf("CurrentByte: %i\n\r", CurrentByte);
 
 				// increment index 
 				index++;
@@ -187,7 +189,8 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 			
 			if ( ThisEvent.EventType == ES_BYTE_SENT) { // from UART ISR
 				// if index = length of array, we are done sending data
-				if (index == DataPacketLength) {
+				if (index == (DataPacketLength)) {
+					printf("Sent all bytes: TransmitSM \n\r");
 					// set LastByteFlag
 					LastByteFlag = 1;
 
@@ -200,7 +203,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-
+          printf("CurrentByte: %i\n\r", CurrentByte);
 					// increment index 
 					index++;
 

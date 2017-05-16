@@ -151,6 +151,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
+					printf("Start Delimiter Received: ReceiveSM \n\r");
 					// start timer 
 					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
 					
@@ -168,6 +169,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
+				printf("MSBLength Recevied: Receive_SM \n\r");
 				// store MSB in data packet 
 				MSBLength = ThisEvent.EventParam; 
 				// start receive timer
@@ -184,6 +186,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
+				printf("LSBLength Received: Receive_SM \n\r");
 				// store LSB in data packet 
 				LSBLength = ThisEvent.EventParam; 
 				
@@ -213,15 +216,18 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
+				printf("Receiving Data: ReceiveSM \n\r");
 
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
+					printf("CheckSum Received %i: ReceiveSM", ThisEvent.EventParam);
 					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
+						printf("Checksum is good: ReceiveSM");
 						// if good checksum, post PacketReceived event to FARMER_SM
 						ES_Event ThisEvent;         
 						ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
 						ThisEvent.EventParam = FrameLength; 
-						//PostComm_Service(ThisEvent);
+						PostComm_Service(ThisEvent);
 					} else {
 						// if bad checksum, don't do anything? 
 					}

@@ -111,13 +111,7 @@ bool Check4Keystroke(void)
     ES_Event ThisEvent;
     ThisEvent.EventType = ES_NEW_KEY;
     ThisEvent.EventParam = GetNewKey();
-    // test distribution list functionality by sending the 'L' key out via
-    // a distribution list.
-    if ( ThisEvent.EventParam == 'L'){
-      ES_PostList00( ThisEvent );
-    }else{   // otherwise post to Service 0 for processing
-      PostIMU_Service( ThisEvent );
-    }
+		PostMapKeys(ThisEvent);
     return true;
   }
   return false;

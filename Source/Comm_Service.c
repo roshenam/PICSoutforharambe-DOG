@@ -19,6 +19,7 @@
 
 #include "Hardware.h"
 #include "Constants.h"
+#include "Transmit_SM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 
@@ -55,7 +56,6 @@ static uint8_t DataPacket_Tx[40];
 ****************************************************************************/
 bool InitComm_Service( uint8_t Priority )
 {
-  ES_Event ThisEvent;
 
   MyPriority = Priority;
 
@@ -110,6 +110,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
   switch ( ThisEvent.EventType )
   {
     case ES_DATAPACKET_RECEIVED  : 
+				printf("Datapacket received: Comm_Service \n\r");
 			  DataPacket_Rx	= GetDataPacket();
 				uint8_t API_Ident = *(DataPacket_Rx + API_IDENT_BYTE_INDEX_RX);
 				if (API_Ident == API_IDENTIFIER_Rx) {
@@ -132,12 +133,17 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 						NewEvent.EventParam = ThisEvent.EventParam; //the frame length
 						PostDOG_SM(NewEvent);
 					} else if (API_Ident == API_IDENTIFIER_Tx_Result) {
+						printf("Result of transmission message received: Comm_Service");
+						//byte 6, the byte after frame ID
 						//check if the message is a success = 0, no ACK = 1, CCA failure = 2, Purged = 3
 						//if not 0, resend the message
+					} else if (API_Ident == 0x8A) {
+						printf("Hardware Reset");
 					}
     break;
 
     case ES_CONSTRUCT_DOG_ACK :
+			printf("Constructing Dog Ack: Comm_Service \n\r");
 					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
 					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00;
 					DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = PAIR_ACK_FRAME_LENGTH;

@@ -596,6 +596,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>MapKeys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\MapKeys.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -735,6 +740,8 @@
               <FileName>Transmit_SM.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\Transmit_SM.h</FilePath>
+            </File>
+            <File>
               <FileName>HoverControl_Module.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\HoverControl_Module.h</FilePath>
@@ -743,6 +750,11 @@
               <FileName>Comm_Service.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\Comm_Service.h</FilePath>
+            </File>
+            <File>
+              <FileName>MapKeys.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\MapKeys.h</FilePath>
             </File>
           </Files>
         </Group>

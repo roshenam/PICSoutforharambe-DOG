@@ -35,6 +35,11 @@ int main(void)
 	printf("the 2nd Generation Events & Services Framework V2.2\r\n");
 	printf("%s %s\n",__TIME__, __DATE__);
 	printf("\n\r\n");
+	
+	printf("------------------------MAPKEYS--------------------------------\n\r");
+	printf("D: ES_CONSTRUCT_DOG_ACK \n\r");
+	printf("---------------------------------------------------------------\n\r");
+	printf("\n\r");
 
 	// Your hardware initialization function calls go here
 

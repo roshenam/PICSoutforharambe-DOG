@@ -61,7 +61,7 @@ static uint8_t PairedFarmer_LSB;
 ****************************************************************************/
 bool InitDOG_SM ( uint8_t Priority )
 {
-  ES_Event ThisEvent;
+  //ES_Event ThisEvent;
 
   MyPriority = Priority;
 	
@@ -134,7 +134,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
             //Transmit an 0x02 PAIR_ACK message to FARMER
             ES_Event NewEvent;
 						NewEvent.EventType = ES_CONSTRUCT_DOG_ACK;
-						//PostComm_Service(NewEvent); add back in when included
+						PostComm_Service(NewEvent); //add back in when included
             
             //turn the Lift Fan On
             ActivateHover();
