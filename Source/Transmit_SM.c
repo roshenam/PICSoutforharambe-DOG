@@ -25,6 +25,7 @@
 #include "driverlib/pin_map.h"	// Define PART_TM4C123GH6PM in project
 #include "driverlib/gpio.h"
 
+#include "Comm_Service.h"
 #include "Transmit_SM.h"
 #include "Receive_SM.h"
 #include "UART.h"
@@ -149,7 +150,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
             LastByteFlag = 0;
 
             // get pointer to array of message
-            DataToSend = GetDataPacket(); // change to GetDataToSend
+            DataToSend = GetDataPacket_Tx(); // function from Comm_Service
          }
     break;
 
@@ -190,6 +191,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// set LastByteFlag
 					LastByteFlag = 1;
 
+					// set index back to 0
+					index = 0;
+					
 					// go back to Idle 
 					CurrentState = Idle;
 				} else {

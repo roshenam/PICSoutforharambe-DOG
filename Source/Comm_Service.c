@@ -53,7 +53,7 @@ static uint8_t DataPacket_Tx[40];
  Author
      Mihika Hemmady
 ****************************************************************************/
-bool InitDOG_SM ( uint8_t Priority )
+bool InitComm_Service( uint8_t Priority )
 {
   ES_Event ThisEvent;
 
@@ -143,17 +143,21 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 					DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = PAIR_ACK_FRAME_LENGTH;
 					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
-					uint8_t PairedFarmer_MSB = GetPairedFarmerMSB();
-					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = PairedFarmer_MSB;
-					uint8_t PairedFarmer_LSB = GetPairedFarmerLSB();
-					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = PairedFarmer_LSB;
+					//uint8_t PairedFarmer_MSB = GetPairedFarmerMSB();
+					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = 0x21; //PairedFarmer_MSB;
+					//uint8_t PairedFarmer_LSB = GetPairedFarmerLSB();
+					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = 0x8B; //PairedFarmer_LSB;
 					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = 0x00;
 					DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_IDENTIFICATION;
+		
+					// add check sum
+					DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F; 
 
 					ES_Event NewEvent;
-					NewEvent.EventType = ES_SEND_DOG_ACK;
-					NewEvent.EventParam = &DataPacket_Tx[0]; //param is pointer to data packet
+					NewEvent.EventType = ES_START_XMIT;
+					NewEvent.EventParam = 10; //param is length of data packet
 					//Post NewEvent to transmit service
+					PostTransmit_SM(NewEvent);
     break;
 
 		

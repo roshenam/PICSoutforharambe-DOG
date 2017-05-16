@@ -145,6 +145,10 @@ void InitUART(void) {
 		// clear interrupt flag 
 		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_TXIC;
 
+		// post ByteSent event 
+		ES_Event ThisEvent;
+		ThisEvent.EventType = ES_BYTE_SENT;
+		
 		// if this was last byte in message block
 		if (IsLastByte()) { // isLastByte from Transmit_SM
 			// disable TXIM 

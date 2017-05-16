@@ -559,11 +559,7 @@
                   <RVCTZI>0</RVCTZI>
                   <RVCTOtherData>0</RVCTOtherData>
                   <ModuleSelection>0</ModuleSelection>
-<<<<<<< HEAD
                   <IncludeInBuild>1</IncludeInBuild>
-=======
-                  <IncludeInBuild>0</IncludeInBuild>
->>>>>>> 4a72d544c14b5d146e33f90d1ebe1811d98e7ce1
                   <AlwaysBuild>2</AlwaysBuild>
                   <GenerateAssemblyFile>2</GenerateAssemblyFile>
                   <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -736,11 +732,9 @@
               <FilePath>.\Headers\DOG_SM.h</FilePath>
             </File>
             <File>
-<<<<<<< HEAD
               <FileName>Transmit_SM.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\Transmit_SM.h</FilePath>
-=======
               <FileName>HoverControl_Module.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\HoverControl_Module.h</FilePath>
@@ -749,7 +743,6 @@
               <FileName>Comm_Service.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\Comm_Service.h</FilePath>
->>>>>>> 4a72d544c14b5d146e33f90d1ebe1811d98e7ce1
             </File>
           </Files>
         </Group>

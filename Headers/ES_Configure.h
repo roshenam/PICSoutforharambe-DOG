@@ -30,7 +30,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 4
+#define NUM_SERVICES 5
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -95,11 +95,11 @@
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public function prototypes
-#define SERV_4_HEADER "TestHarnessService4.h"
+#define SERV_4_HEADER "Comm_Service.h"
 // the name of the Init function
-#define SERV_4_INIT InitTestHarnessService4
+#define SERV_4_INIT InitComm_Service
 // the name of the run function
-#define SERV_4_RUN RunTestHarnessService4
+#define SERV_4_RUN RunComm_Service
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 3
 #endif
@@ -264,7 +264,7 @@ typedef enum {  ES_NO_EVENT = 0,
 								//DOG_SM
 								ES_PAIR_REQUEST_RECEIVED, ES_ENCRYPTION_KEY_RECEIVED,
 								ES_NEW_CMD_RECEIVED, ES_ENCRYPTION_COUNTER_INCORRECT, 
-								ES_CONSTRUCT_DOG_ACK, ES_SEND_DOG_ACK,
+								ES_CONSTRUCT_DOG_ACK,
 								//Transmit_SM
 								ES_START_XMIT, ES_BYTE_SENT
 
