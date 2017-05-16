@@ -222,9 +222,9 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
-					printf("CheckSum Received %i: ReceiveSM", ThisEvent.EventParam);
+					printf("CheckSum: %i\r\n", ThisEvent.EventParam);
 					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
-						printf("Checksum is good: ReceiveSM");
+						//printf("Checksum is good: ReceiveSM");
 						// if good checksum, post PacketReceived event to FARMER_SM
 						ES_Event ThisEvent;         
 						ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
