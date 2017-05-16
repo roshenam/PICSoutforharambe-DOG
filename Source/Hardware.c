@@ -104,7 +104,7 @@ void InitPorts(void) {
 void InitGPIOPins(void) {
 
 	//Lift fan PA2
-	InitPin(LIFT_FAN_PORT, LIFT_FAN_PIN, LO);
+	InitPin(LIFT_FAN_PORT, LIFT_FAN_PIN, OUTPUT);
 	//initialize pins
   
 }

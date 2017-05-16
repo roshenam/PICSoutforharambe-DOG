@@ -30,7 +30,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 6
+#define NUM_SERVICES 7
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -121,11 +121,11 @@
 // These are the definitions for Service 6
 #if NUM_SERVICES > 6
 // the header file with the public function prototypes
-#define SERV_6_HEADER "TestHarnessService6.h"
+#define SERV_6_HEADER "DataService.h"
 // the name of the Init function
-#define SERV_6_INIT InitTestHarnessService6
+#define SERV_6_INIT InitDataService
 // the name of the run function
-#define SERV_6_RUN RunTestHarnessService6
+#define SERV_6_RUN RunDataService
 // How big should this services Queue be?
 #define SERV_6_QUEUE_SIZE 3
 #endif
@@ -266,8 +266,9 @@ typedef enum {  ES_NO_EVENT = 0,
 								ES_NEW_CMD_RECEIVED, ES_ENCRYPTION_COUNTER_INCORRECT, 
 								ES_CONSTRUCT_DOG_ACK,
 								//Transmit_SM
-								ES_START_XMIT, ES_BYTE_SENT
-
+								ES_START_XMIT, ES_BYTE_SENT,
+								// Hover
+								ES_HOVER_ON
 } ES_EventTyp_t ;
 
 /****************************************************************************/
@@ -342,6 +343,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define RECEIVE_TIMER 0
 #define GameTimer 1
 #define TRANSMIT_TIMER 2
+//#define TIMER_A 3
 
 
 #endif /* CONFIGURE_H */

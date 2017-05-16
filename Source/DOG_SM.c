@@ -20,6 +20,7 @@
 #include "Hardware.h"
 #include "Constants.h"
 #include "DOG_SM.h"
+#include "DataService.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 
@@ -137,7 +138,11 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						PostComm_Service(NewEvent); //add back in when included
             
             //turn the Lift Fan On
-            ActivateHover();
+            //ActivateHover();
+						ES_Event ThisEvent;
+						ThisEvent.EventType = ES_HOVER_ON;
+						PostDataService(ThisEvent);
+						
             NextState = Paired_Waiting4Key;
           }
         }						
