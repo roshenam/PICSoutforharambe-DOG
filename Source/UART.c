@@ -123,7 +123,6 @@ void InitUART(void) {
 	// read UARTMIS
     // if RXMIS set:
  	if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
-		//printf("RXMIS INTERRUPT \n\r");
 		// save new data byte
 		DataByte = HWREG(UART7_BASE + UART_O_DR); 
 
