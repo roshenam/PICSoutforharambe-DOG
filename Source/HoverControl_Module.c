@@ -38,11 +38,17 @@
 /*------------------------------ Module Code ------------------------------*/
 
 void ActivateHover(void) {
-  SetOutput(LIFT_FAN_PORT, LIFT_FAN_PIN, HI);
+  ES_Event ThisEvent;
+	ThisEvent.EventType = ES_HOVER_ON;
+	PostLiftFan_Service(ThisEvent);
 }
 
 void DeactivateHover(void) {
-  SetOutput(LIFT_FAN_PORT, LIFT_FAN_PIN, LO);
+  ES_Event ThisEvent;
+	ThisEvent.EventType = ES_HOVER_OFF;
+	PostLiftFan_Service(ThisEvent);
+	
+	//Also Deactivate Thrust Fans
 }
 
 /*

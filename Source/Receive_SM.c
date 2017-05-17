@@ -77,7 +77,7 @@ bool InitReceive_SM ( uint8_t Priority )
 	
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
-	printf("Initialized in Receive_SM\r\n");
+	//printf("Initialized in Receive_SM\r\n");
   if (ES_PostToService( MyPriority, ThisEvent) == true)
   {
       return true;
@@ -151,6 +151,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
+					printf("------------RECEIVING----------------------\n\r");
 					printf("Start: %i\n\r", ThisEvent.EventParam);
 					// start timer 
 					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
@@ -214,11 +215,11 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == RECEIVE_TIMER ) {
 				// go back to Wait4Start
 				CurrentState = Wait4Start;
-				printf("timed out\r\n");
+				printf("RECEIVE: timed out\r\n");
 			}		
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("Receiving: %i\n\r", ThisEvent.EventParam);
+				printf("Data: %i\n\r", ThisEvent.EventParam);
 
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
@@ -231,7 +232,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 						ThisEvent.EventParam = FrameLength; 
 						PostComm_Service(ThisEvent);
 					} else {
-						// if bad checksum, don't do anything? 
+						// if bad checksum, don't do anything
 					}
 					
 					// go back to Wait4Start

@@ -121,10 +121,14 @@ ES_Event RunMapKeys( ES_Event ThisEvent )
           // this sample is just a dummy so it posts a ES_NO_EVENT
             case 'D' : 
 							printf("CONSTRUCT A DOG TO FARMER ACK!: MapKeys \n\r");
-							NewEvent.EventType = ES_CONSTRUCT_DOG_ACK;
+							NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
+							NewEvent.EventParam = DOG_ACK;
 							PostComm_Service(NewEvent);
               break;
-						
+						case 'S' :
+							printf("UNPAIR & STOP HOVERING \n\r");
+							NewEvent.EventType = ES_UNPAIR;
+							PostDOG_SM(NewEvent);
         }
     
     }

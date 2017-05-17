@@ -69,7 +69,9 @@ bool InitDOG_SM ( uint8_t Priority )
   // put us into the Initial PseudoState
   CurrentState = Waiting2Pair;
 
-  //how to get dog tag number?
+  //GET DOG TAG NUMBER
+	DogTag = 0;
+	//DogTag = ReadPin();
 	
 	InitAll(); //initialize all hardware (ports, pins, interrupts)
 	
@@ -122,6 +124,11 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
 	DOGState_t NextState;
 
+	if (ThisEvent.EventType == ES_UNPAIR) {
+		DeactivateHover();
+		NextState = Waiting2Pair;
+	}
+	
   switch ( CurrentState )
   {
     case Waiting2Pair : 
@@ -134,14 +141,13 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
             
             //Transmit an 0x02 PAIR_ACK message to FARMER
             ES_Event NewEvent;
-						NewEvent.EventType = ES_CONSTRUCT_DOG_ACK;
+						NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
+						NewEvent.EventParam = DOG_ACK;
 						PostComm_Service(NewEvent); //add back in when included
             
             //turn the Lift Fan On
-            //ActivateHover();
-						ES_Event ThisEvent;
-						ThisEvent.EventType = ES_HOVER_ON;
-						PostDataService(ThisEvent);
+            ActivateHover();
+						
 						
             NextState = Paired_Waiting4Key;
           }

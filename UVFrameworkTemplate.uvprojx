@@ -602,9 +602,9 @@
               <FilePath>.\Source\MapKeys.c</FilePath>
             </File>
             <File>
-              <FileName>DataService.c</FileName>
+              <FileName>LiftFan_Service.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Source\DataService.c</FilePath>
+              <FilePath>.\Source\LiftFan_Service.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -762,9 +762,9 @@
               <FilePath>.\Headers\MapKeys.h</FilePath>
             </File>
             <File>
-              <FileName>DataService.h</FileName>
+              <FileName>LiftFan_Service.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Headers\DataService.h</FilePath>
+              <FilePath>.\Headers\LiftFan_Service.h</FilePath>
             </File>
           </Files>
         </Group>

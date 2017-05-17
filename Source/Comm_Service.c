@@ -19,7 +19,7 @@
 
 #include "Hardware.h"
 #include "Constants.h"
-#include "Transmit_SM.h"
+
 
 /*----------------------------- Module Defines ----------------------------*/
 
@@ -110,10 +110,10 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
   switch ( ThisEvent.EventType )
   {
     case ES_DATAPACKET_RECEIVED  : 
-				printf("Datapacket received: Comm_Service \n\r");
 			  DataPacket_Rx	= GetDataPacket();
 				uint8_t API_Ident = *(DataPacket_Rx + API_IDENT_BYTE_INDEX_RX);
 				if (API_Ident == API_IDENTIFIER_Rx) {
+					  printf("RECEIVED A DATAPACKET (Comm_Service) \n\r");
 						ES_Event NewEvent;
 						uint8_t PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
 						switch (PacketType) {
@@ -126,42 +126,74 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 							case FARMER_DOG_CTRL :
 								NewEvent.EventType = ES_NEW_CMD_RECEIVED;
 								break;
-							case FARMER_DOG_RESET_ENCR :
-                NewEvent.EventType = ES_ENCRYPTION_COUNTER_INCORRECT;
-								break;
 						}
 						NewEvent.EventParam = ThisEvent.EventParam; //the frame length
 						PostDOG_SM(NewEvent);
-					} else if (API_Ident == API_IDENTIFIER_Tx_Result) {
-						printf("Result of transmission message received: Comm_Service");
-						//byte 6, the byte after frame ID
-						//check if the message is a success = 0, no ACK = 1, CCA failure = 2, Purged = 3
-						//if not 0, resend the message
-					} else if (API_Ident == 0x8A) {
-						printf("Hardware Reset");
+					} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 
+						printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service) \n\r");
+						uint8_t TxStatusResult = *(DataPacket_Rx + TX_STATUS_BYTE_INDEX);
+						if (TxStatusResult == SUCCESS) {
+							//do nothing
+						} else {
+							//RESEND THE TX DATA PACKET -- ADD CODE IN HERE
+						}
+					} else if (API_Ident == API_IDENTIFIER_Reset) {
+						printf("Hardware Reset Status Message \n\r");
 					}
     break;
 
-    case ES_CONSTRUCT_DOG_ACK :
-			printf("Constructing Dog Ack: Comm_Service \n\r");
+    case ES_CONSTRUCT_DATAPACKET :
+					printf("--------------CONSTRUCTING-----------\n\r");
+					ES_Event NewEvent;
+					//Header Construction
+					printf("Constructing Datapacket (Comm_Service) \n\r");
 					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
-					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00;
-					DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = PAIR_ACK_FRAME_LENGTH;
+					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00; 
 					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
-					//uint8_t PairedFarmer_MSB = GetPairedFarmerMSB();
-					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = 0x21; //PairedFarmer_MSB;
+					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = 0x21; //GetPairedFarmer_MSB() DONT HARDCODE;
 					//uint8_t PairedFarmer_LSB = GetPairedFarmerLSB();
-					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = 0x8B; //PairedFarmer_LSB;
-					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = 0x00;
-					DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_IDENTIFICATION;
+					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = 0x8B; //GetPairedFarmer_LSB() DONT HARDCODE;
+					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = OPTIONS;
+					switch (ThisEvent.EventParam) {
+						case DOG_ACK:
+							printf("Dog Ack Construction \n\r");
+							//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = ACK_N_ENCRYPT_FRAME_LEN;
+							//add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_ACK;
+							// add check sum
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F;
+						  //set the frame length as event param
+							NewEvent.EventParam = ACK_N_ENCRYPT_FRAME_LEN;						
+							break;
+						case DOG_FARMER_RESET_ENCR:
+							printf("Reset Encryption Construction \n\r");
+							//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = ACK_N_ENCRYPT_FRAME_LEN;
+							//add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_RESET_ENCR;
+							// add check sum
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x52;
+						  //set the frame length as event param
+							NewEvent.EventParam = ACK_N_ENCRYPT_FRAME_LEN;	
+							break;
+						case DOG_FARMER_REPORT:
+							printf("Dog Report Construction \n\r");
+								//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = STATUS_FRAME_LEN;
+							//add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_REPORT;
+							//add in data from IMU SERVICE
+							// add check sum
+							//DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+13] = ???; NEED TO CALCULATE THE CHECKSUM CORRECTLY!!!
+						  //set the frame length as event param
+							NewEvent.EventParam = STATUS_FRAME_LEN;	
+							break;
+					}
 		
-					// add check sum
-					DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F; 
-
-					ES_Event NewEvent;
 					NewEvent.EventType = ES_START_XMIT;
-					NewEvent.EventParam = 10; //param is length of data packet
+					 //param is length of entire data packet
 					//Post NewEvent to transmit service
 					PostTransmit_SM(NewEvent);
     break;

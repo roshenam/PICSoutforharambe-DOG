@@ -28,23 +28,27 @@
 #define HI											  1
 #define LO											  0
 
-//Data Types
+//Data Packet Types
 #define DOG_FARMER_REPORT         0x00
 #define FARMER_DOG_REQ_2_PAIR     0x01
-#define DOG_FARMER_IDENTIFICATION 0x02
+#define DOG_ACK										0x02
 #define FARMER_DOG_ENCR_KEY       0x03
 #define FARMER_DOG_CTRL           0x04
-#define FARMER_DOG_RESET_ENCR     0x05
+#define DOG_FARMER_RESET_ENCR     0x05
 
-//Data Packet Array
+//API Structure Stuff
 #define FRAME_ID                  0x01
 #define API_IDENTIFIER_Tx         0x01
 #define API_IDENTIFIER_Rx         0x81
 #define API_IDENTIFIER_Tx_Result  0x89
+#define API_IDENTIFIER_Reset			0x8A
 #define MAX_FRAME_LENGTH          40
 #define START_DELIMITER 					0x7E
+#define OPTIONS										0x00
 
-#define PAIR_ACK_FRAME_LENGTH     6
+//frame lengths
+#define ACK_N_ENCRYPT_FRAME_LEN		6
+#define STATUS_FRAME_LEN					18 //13 bytes + 5 header type bytes in frame data
 
 //Tx Packet
 #define START_BYTE_INDEX					0
@@ -57,15 +61,24 @@
 #define OPTIONS_BYTE_INDEX_TX     7
 #define PACKET_TYPE_BYTE_INDEX_TX 8 
 
+#define HEADER_LENGTH							3
+
 //Rx Packet
 #define API_IDENT_BYTE_INDEX_RX   0
+#define FRAME_ID_BYTE_INDEX_RX		1
+#define TX_STATUS_BYTE_INDEX			2
+
 #define SOURCE_ADDRESS_MSB_INDEX  1
 #define SOURCE_ADDRESS_LSB_INDEX  2
 #define RSSI_BYTE_INDEX           3 
 #define OPTIONS_BYTE_INDEX_RX			4
-#define PACKET_TYPE_BYTE_INDEX_RX	5
-#define DOG_TAG_BYTE_INDEX        6   
 
+#define PACKET_TYPE_BYTE_INDEX_RX	5
+#define DOG_TAG_BYTE_INDEX        6  
+ 
+
+//Result from Transmit Packet
+#define SUCCESS										0
 
 // Servo
 #define SERVO_MAX_PULSE						2000 // uS
