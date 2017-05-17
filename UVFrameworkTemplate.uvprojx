@@ -601,6 +601,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\MapKeys.c</FilePath>
             </File>
+            <File>
+              <FileName>DataService.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\DataService.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -755,6 +760,11 @@
               <FileName>MapKeys.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\MapKeys.h</FilePath>
+            </File>
+            <File>
+              <FileName>DataService.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\DataService.h</FilePath>
             </File>
           </Files>
         </Group>

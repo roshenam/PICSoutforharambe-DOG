@@ -177,6 +177,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					
 				// set current state to SendingData
 				CurrentState = SendingData;
+				
+				//reset the lastbyte flag
+				LastByteFlag = 0;
 			}
 			
     break;
