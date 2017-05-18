@@ -85,8 +85,11 @@
 #define SERVO_MIN_PULSE						1000 // uS
 
 
-//Game Time
-#define GAME_TIME									138
+//Timers
+#define ONE_SEC										976
+#define GAME_TIME									218*ONE_SEC
+#define INTER_MESSAGE_TIME				300	// FARMER transmits a packet every 300 ms 
+#define LOST_COMM_TIME						ONE_SEC // DOG+FARMER unpair if no message received after 1 second
 
 //Interrupts
 #define PRIORITY_0 								0
