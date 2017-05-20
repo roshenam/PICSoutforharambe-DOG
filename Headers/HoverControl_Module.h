@@ -18,6 +18,10 @@
 // Public Function Prototypes
 void ActivateHover(void);
 void DeactivateHover(void);
+void ActivateTurning(uint8_t Turning);
+void ActivateDirectionSpeed(uint8_t DirectionSpeed);
+void ActivatePeripheral(uint8_t Peripheral);
+void ActivateBrake(uint8_t Brake);
 
 #endif /* Hovercontrol_Module_H */
 

@@ -37,6 +37,7 @@
 
 /*------------------------------ Module Code ------------------------------*/
 
+
 void ActivateHover(void) {
   ES_Event ThisEvent;
 	ThisEvent.EventType = ES_HOVER_ON;
@@ -51,16 +52,19 @@ void DeactivateHover(void) {
 	//Also Deactivate Thrust Fans
 }
 
-/*
-void TurnLeft() {
+
+void ActivateTurning(uint8_t Turning) {
 }
 
-void TurnRight() {
+
+void ActivateDirectionSpeed(uint8_t DirectionSpeed) {
+} 
+
+void ActivatePeripheral(uint8_t Peripheral) {
 }
 
-void ChangeSpeed() {
-} */
- 
+void ActivateBrake(uint8_t Brake) {
+}
 
 
 
