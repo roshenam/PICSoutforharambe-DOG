@@ -24,16 +24,20 @@
 /*----------------------------- Module Defines ----------------------------*/
 
 
-
 /*---------------------------- Module Functions ---------------------------*/
-
+uint8_t CalculateChecksum (uint8_t FrameLength);
+void ConstructIMUData (void);
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t MyPriority;
 
 static uint8_t* DataPacket_Rx;
-static uint8_t DataPacket_Tx[40];
+static uint8_t DataPacket_Tx[MAX_PACKET_LENGTH];
+static uint8_t DataFrameLength_Tx;
 
+
+
+static uint8_t* IMU_Data;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -123,7 +127,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 							case FARMER_DOG_ENCR_KEY :
 								NewEvent.EventType = ES_ENCRYPTION_KEY_RECEIVED;
 								break;
-							case FARMER_DOG_CTRL :
+							default :
 								NewEvent.EventType = ES_NEW_CMD_RECEIVED;
 								break;
 						}
@@ -135,7 +139,11 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 						if (TxStatusResult == SUCCESS) {
 							//do nothing
 						} else {
-							//RESEND THE TX DATA PACKET -- ADD CODE IN HERE
+							//RESEND THE TX DATA PACKET
+							ES_Event NewEvent;
+							NewEvent.EventType = ES_START_XMIT;
+							NewEvent.EventParam = DataFrameLength_Tx;
+							PostComm_Service(NewEvent);
 						}
 					} else if (API_Ident == API_IDENTIFIER_Reset) {
 						printf("Hardware Reset Status Message \n\r");
@@ -144,55 +152,55 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 
     case ES_CONSTRUCT_DATAPACKET :
 					printf("--------------CONSTRUCTING-----------\n\r");
-					ES_Event NewEvent;
 					//Header Construction
 					printf("Constructing Datapacket (Comm_Service) \n\r");
 					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
 					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00; 
 					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
-					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = 0x21; //GetPairedFarmer_MSB() DONT HARDCODE;
-					//uint8_t PairedFarmer_LSB = GetPairedFarmerLSB();
-					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = 0x8B; //GetPairedFarmer_LSB() DONT HARDCODE;
+					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = GetPairedFarmerMSB(); //from DOG_SM
+					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = GetPairedFarmerLSB(); //from Dog_SM
 					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = OPTIONS;
+					//Data Construction
 					switch (ThisEvent.EventParam) {
 						case DOG_ACK:
 							printf("Dog Ack Construction \n\r");
-							//add the unique frame length
-							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = ACK_N_ENCRYPT_FRAME_LEN;
+							//store the length of the data frame
+						  DataFrameLength_Tx = ACK_N_ENCRYPT_FRAME_LEN;
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_ACK;
-							// add check sum
-							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F;
-						  //set the frame length as event param
-							NewEvent.EventParam = ACK_N_ENCRYPT_FRAME_LEN;						
+							//no extra data
 							break;
 						case DOG_FARMER_RESET_ENCR:
 							printf("Reset Encryption Construction \n\r");
-							//add the unique frame length
-							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = ACK_N_ENCRYPT_FRAME_LEN;
+						  //store the length of the data frame
+						  DataFrameLength_Tx = ACK_N_ENCRYPT_FRAME_LEN;
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_RESET_ENCR;
-							// add check sum
-							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x52;
-						  //set the frame length as event param
-							NewEvent.EventParam = ACK_N_ENCRYPT_FRAME_LEN;	
+							//no extra data
 							break;
 						case DOG_FARMER_REPORT:
 							printf("Dog Report Construction \n\r");
-								//add the unique frame length
-							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = STATUS_FRAME_LEN;
+						  //store the length of the data frame
+						  DataFrameLength_Tx = STATUS_FRAME_LEN;
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = DOG_FARMER_REPORT;
 							//add in data from IMU SERVICE
-							// add check sum
-							//DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+13] = ???; NEED TO CALCULATE THE CHECKSUM CORRECTLY!!!
-						  //set the frame length as event param
-							NewEvent.EventParam = STATUS_FRAME_LEN;	
+						  IMU_Data = GetIMU_Data();
+							ConstructIMUData();
 							break;
 					}
-		
+					
+					//Add Unique Frame Length Data and Checksum
+		      //add the unique frame length
+					DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = DataFrameLength_Tx;
+					//add checksum
+					DataPacket_Tx[HEADER_LENGTH+DataFrameLength_Tx] = CalculateChecksum(DataFrameLength_Tx);
+					
+					//STart Xmit of data
+					ES_Event NewEvent;
 					NewEvent.EventType = ES_START_XMIT;
+					NewEvent.EventParam = DataFrameLength_Tx;						
 					 //param is length of entire data packet
 					//Post NewEvent to transmit service
 					PostTransmit_SM(NewEvent);
@@ -202,6 +210,25 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
   }                                  // end switch on Current State
 
   return ReturnEvent;
+}
+
+/*******HELPER FUNCTIONS**********/
+uint8_t CalculateChecksum (uint8_t FrameLength) {
+	uint8_t RunningSum = 0;
+	uint8_t Checksum = 0;
+	uint8_t numBytes = FrameLength + HEADER_LENGTH;
+	for (int i = 0; i < numBytes; i++) {
+		RunningSum += DataPacket_Tx[i];
+	}
+	Checksum = 0xFF - RunningSum;
+	return Checksum;
+}
+
+void ConstructIMUData (void) {
+	uint8_t DataPacketIndex = PACKET_TYPE_BYTE_INDEX_TX + 1;
+	for (int i = 0; i < IMU_DATA_NUM_BYTES; i++) {
+		DataPacket_Tx[DataPacketIndex + i] = *(IMU_Data + i);
+	}
 }
 
 /******GETTER FUNCTIONS************/

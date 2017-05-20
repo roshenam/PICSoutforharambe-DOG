@@ -50,8 +50,10 @@
 /*---------------------------- Module Variables ---------------------------*/
 // with the introduction of Gen2, we need a module level Priority variable
 static uint8_t MyPriority;
-// add a deferral queue for up to 3 pending deferrals +1 to allow for ovehead
-static ES_Event DeferralQueue[3+1];
+
+static uint8_t IMUData[IMU_DATA_NUM_BYTES]; // array containing all bytes in IMU packet
+static uint8_t ArrayIndex = 0;
+static uint8_t *outgoingDataPacket; //pointer to data packet
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -73,25 +75,12 @@ static ES_Event DeferralQueue[3+1];
      J. Edward Carryer, 01/16/12, 10:00
 ****************************************************************************/
 bool InitIMU_Service ( uint8_t Priority )
-{
-  ES_Event ThisEvent;
-  
+{  
   MyPriority = Priority;
-  /********************************************
-   in here you write your initialization code
-   *******************************************/
-	// initialize deferral queue for testing Deferal function
-  ES_InitDeferralQueueWith( DeferralQueue, ARRAY_SIZE(DeferralQueue) );
-  
-  // post the initial transition event
-  ThisEvent.EventType = ES_INIT;
-  if (ES_PostToService( MyPriority, ThisEvent) == true)
-  {
-      return true;
-  }else
-  {
-      return false;
-  }
+
+	outgoingDataPacket = &IMUData[0];
+ 
+  return true;
 }
 
 /****************************************************************************
@@ -138,15 +127,12 @@ ES_Event RunIMU_Service( ES_Event ThisEvent )
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
   
-  switch (ThisEvent.EventType){
-    case ES_NEW_KEY :  // announce
-      printf("ES_NEW_KEY received with -> %c <- in Service 0\r\n", 
-              (char)ThisEvent.EventParam);
-      break;
-    default :
-      break;
-  }
+  
   return ReturnEvent;
+}
+
+uint8_t* GetIMU_Data(void) {
+	return outgoingDataPacket;
 }
 
 /***************************************************************************

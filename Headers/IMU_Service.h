@@ -17,6 +17,9 @@ bool InitIMU_Service ( uint8_t Priority );
 bool PostIMU_Service( ES_Event ThisEvent );
 ES_Event RunIMU_Service( ES_Event ThisEvent );
 
+/***GETTER****/
+uint8_t* GetIMU_Data(void);
+
 
 #endif /* IMU_Service_H */
 

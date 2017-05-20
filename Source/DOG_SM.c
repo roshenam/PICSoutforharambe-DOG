@@ -20,14 +20,17 @@
 #include "Hardware.h"
 #include "Constants.h"
 #include "DOG_SM.h"
-#include "DataService.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 
 
 /*---------------------------- Module Functions ---------------------------*/
-uint8_t GetPairedFarmerLSB(void);
-uint8_t GetPairedFarmerMSB(void);
+void StoreEncryptionKey(void);
+void TransmitStatus(void);
+void DecodeCommandMessage(void);
+void TransmitAck(void);
+void TransmitResetEncryption(void);
+
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t MyPriority;
@@ -36,9 +39,18 @@ static DOGState_t CurrentState;
 static uint8_t DogTag = 0;
 
 static uint8_t* DataPacket_Rx;
+static uint8_t  DecryptedFarmerCommands[FARMER_CMD_LENGTH]; //header and data bytes
 
 static uint8_t PairedFarmer_MSB;
 static uint8_t PairedFarmer_LSB;
+
+static uint8_t EncryptionKey[ENCRYPTION_KEY_LENGTH];
+static uint8_t EncryptionKey_Index = 0;
+
+static uint8_t DirectionSpeed;
+static uint8_t Turning;
+static uint8_t Brake;
+static uint8_t Peripheral;
 
 
 /*------------------------------ Module Code ------------------------------*/
@@ -72,6 +84,7 @@ bool InitDOG_SM ( uint8_t Priority )
   //GET DOG TAG NUMBER
 	DogTag = 0;
 	//DogTag = ReadPin();
+	printf("DOGTAG#: %i \n\r", DogTag);
 	
 	InitAll(); //initialize all hardware (ports, pins, interrupts)
 	
@@ -124,14 +137,20 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
 	DOGState_t NextState;
 
-	if (ThisEvent.EventType == ES_UNPAIR) {
+	if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
+																						&& ThisEvent.EventParam == LOST_COMM_TIMER)) {
 		DeactivateHover();
 		NextState = Waiting2Pair;
-	}
+		//Stop Tail Wag Service!!
+	} 
 	
   switch ( CurrentState )
   {
     case Waiting2Pair : 
+			
+				//initialize encryption key index
+				EncryptionKey_Index = 0;
+		
 				if (ThisEvent.EventType == ES_PAIR_REQUEST_RECEIVED) {
           DataPacket_Rx = GetDataPacket();
           uint8_t DogTagReq = *(DataPacket_Rx + DOG_TAG_BYTE_INDEX);
@@ -140,50 +159,129 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
             PairedFarmer_LSB = *(DataPacket_Rx + SOURCE_ADDRESS_LSB_INDEX);
             
             //Transmit an 0x02 PAIR_ACK message to FARMER
-            ES_Event NewEvent;
-						NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
-						NewEvent.EventParam = DOG_ACK;
-						PostComm_Service(NewEvent); //add back in when included
+            TransmitAck();
             
             //turn the Lift Fan On
             ActivateHover();
 						
+						//start the lost-communications timer for 1s
+						ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 						
             NextState = Paired_Waiting4Key;
           }
         }						
     break;
 
-    case Paired_Waiting4Key:      
-				//if the encryption key 0x03 is received
-					//store the encruption key
-					//restart the 1s transmit timer	
-					//NextState == Paired
-				//if gametimer timeout or 1s transmit timer timeout
-					//deactivate the 1s transmit timer timeout
-					//turn TREAT off
-					//Disable the 1s transmit timer
-					//NextState == Waiting2Pair
-      
+    case Paired_Waiting4Key:   
+				if (ThisEvent.EventType == ES_ENCRYPTION_KEY_RECEIVED) {
+					DataPacket_Rx = GetDataPacket();
+					StoreEncryptionKey();
+					//start the lost-communications timer for 1s
+					ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+					
+					//transmit status
+					TransmitStatus();
+					
+					//Start Tail Wag Service!!
+					
+					NextState = Paired;
+				}      
     break;
 
-		case Paired:   
-				//if new command received 0x04 header
-					//restart 1s transmit timeout timer
-					//execute commands
-					//transmit status 0x00
-				//if encyrption counter incorrect 0x05
-					//reset the encryption counter
-		//if game timer timeout or 1s transmit timer timeout
-					//deactivate 1s transmit timer timeout
-					//TREAT fan off
-					//disable 1s transmit timer
-					//nextState == Waiting2Pair
+		case Paired:
+				if ( ThisEvent.EventType == ES_NEW_CMD_RECEIVED) {
+					DataPacket_Rx = GetDataPacket();
+					//start the lost-communications timer for 1s
+					ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+          //decode
+					DecodeCommandMessage();
+					
+					if (DecryptedFarmerCommands[0] == FARMER_DOG_CTRL) {
+						//executed commands as required
+						DirectionSpeed = DecryptedFarmerCommands[1];
+						Turning = DecryptedFarmerCommands[2];
+						switch (DecryptedFarmerCommands[3]) {
+							case 0x00:
+								Peripheral = OFF;
+								Brake = OFF;
+								break;
+							case 0x01:
+								Peripheral = ON;
+								Brake = OFF;
+								break;
+							case 0x02:
+								Peripheral = OFF;
+								Brake = ON;
+								break;
+							case 0x03:
+								Peripheral = ON;
+								Brake = ON;
+								break;
+						} 
+						ActivateDirectionSpeed(DirectionSpeed);
+						ActivateTurning(Turning);
+						ActivatePeripheral(Peripheral);
+						ActivateBrake(Brake);
+						
+						//tranmsit status message
+						TransmitStatus();
+
+					} else {
+						//reset encryption
+						TransmitResetEncryption();
+						//reset the encryption key
+						EncryptionKey_Index = 0;
+					}
+					
+					NextState = Paired;
+				}
+
     break;
 		
   }                                  // end switch on Current State
   CurrentState = NextState;
   return ReturnEvent;
+}
+
+/******Helper function******/
+void StoreEncryptionKey(void) {
+	uint16_t DataIndex = PACKET_TYPE_BYTE_INDEX_RX + 1;
+	for (int i = 0; i < ENCRYPTION_KEY_LENGTH; i++) {
+		EncryptionKey[i] = *(DataPacket_Rx + DataIndex + i);
+	}
+}
+
+void DecodeCommandMessage(void) {
+	for (int i = 0; i < FARMER_CMD_LENGTH; i++) {
+		DecryptedFarmerCommands[i] = EncryptionKey[EncryptionKey_Index] ^ (*(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i));
+		if (EncryptionKey_Index < 31) {
+				EncryptionKey_Index++;
+		} else {
+			EncryptionKey_Index = 0;
+		}
+	}
+}
+
+void TransmitStatus(void) {
+	 //Transmit an 0x00 DOG STATUS message to FARMER
+		ES_Event NewEvent;
+		NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
+		NewEvent.EventParam = DOG_FARMER_REPORT;
+		PostComm_Service(NewEvent); //add back in when included
+}
+
+void TransmitAck(void) {
+	  ES_Event NewEvent;
+		NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
+		NewEvent.EventParam = DOG_ACK;
+		PostComm_Service(NewEvent); //add back in when included
+}
+
+void TransmitResetEncryption(void) {
+	  ES_Event NewEvent;
+		NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
+		NewEvent.EventParam = DOG_FARMER_RESET_ENCR;
+		PostComm_Service(NewEvent); //add back in when included
 }
 
 /*******Getters************/
