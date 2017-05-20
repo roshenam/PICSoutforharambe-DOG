@@ -230,7 +230,7 @@ uint8_t CalculateChecksum (uint8_t FrameLength) {
 void ConstructIMUData (void) {
 	uint8_t DataPacketIndex = PACKET_TYPE_BYTE_INDEX_TX + 1;
 	for (int i = 0; i < IMU_DATA_NUM_BYTES; i++) {
-		DataPacket_Tx[DataPacketIndex + i] = *(IMU_Data + i);
+		DataPacket_Tx[DataPacketIndex + i] = 2; //*(IMU_Data + i);
 	}
 }
 

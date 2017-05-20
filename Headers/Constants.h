@@ -83,6 +83,8 @@
 #define DOG_TAG_BYTE_INDEX        6  
 
 #define ENCRYPTION_KEY_LENGTH			32
+
+#define DIGITAL_MASK							0x03
  
 
 //Result from Transmit Packet
