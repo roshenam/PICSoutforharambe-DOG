@@ -217,10 +217,13 @@ uint8_t CalculateChecksum (uint8_t FrameLength) {
 	uint8_t RunningSum = 0;
 	uint8_t Checksum = 0;
 	uint8_t numBytes = FrameLength + HEADER_LENGTH;
-	for (int i = 0; i < numBytes; i++) {
+	for (int i = HEADER_LENGTH; i < numBytes; i++) {
 		RunningSum += DataPacket_Tx[i];
 	}
 	Checksum = 0xFF - RunningSum;
+	
+	printf("Running sum: %i\r\n", RunningSum);
+	printf("Check sum: %i\r\n", Checksum);
 	return Checksum;
 }
 
