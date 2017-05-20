@@ -25,10 +25,8 @@
 #include "driverlib/pin_map.h"	// Define PART_TM4C123GH6PM in project
 #include "driverlib/gpio.h"
 
-#include "Comm_Service.h"
-#include "Transmit_SM.h"
-#include "Receive_SM.h"
-#include "UART.h"
+#include "Hardware.h"
+#include "Constants.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define TRANSMIT_TIMER_LENGTH 10 // based off of 9600 baud rate (each character takes ~1.04ms to send)
@@ -81,7 +79,7 @@ bool InitTransmit_SM ( uint8_t Priority )
 	
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
-	printf("Initialized in Transmit_SM\r\n");
+	//printf("Initialized in Transmit_SM\r\n");
   if (ES_PostToService( MyPriority, ThisEvent) == true)
   {
       return true;
@@ -157,14 +155,13 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
     case Idle:      
 			// waiting to receive Start_Xmit event from Comm_Service
 			if ( ThisEvent.EventType == ES_START_XMIT ) {
-				printf("Start Xmit Received: Transmit_SM \n\r");
 				// get length of array 
-				DataPacketLength = ThisEvent.EventParam; 
+				DataPacketLength = ThisEvent.EventParam /*frame length*/ + HEADER_LENGTH + 1 /*checksum bit*/; 
 				
 				// send first byte of array 
 				uint8_t CurrentByte = *(DataToSend+index);
 				SendByte(CurrentByte);
-				printf("CurrentByte: %i\n\r", CurrentByte);
+				printf("START XMIT: %i\n\r", CurrentByte);
 
 				// increment index 
 				index++;
@@ -193,7 +190,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 			if ( ThisEvent.EventType == ES_BYTE_SENT) { // from UART ISR
 				// if index = length of array, we are done sending data
 				if (index == (DataPacketLength)) {
-					printf("Sent all bytes: TransmitSM \n\r");
+					printf("SENT ALL BYTES \n\r");
 					// set LastByteFlag
 					LastByteFlag = 1;
 
@@ -206,7 +203,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-          printf("CurrentByte: %i\n\r", CurrentByte);
+          printf("XMIT DATA: %i\n\r", CurrentByte);
 					// increment index 
 					index++;
 
@@ -230,7 +227,7 @@ static void SendByte(uint8_t DataByte) {
 		// write data to DR 
 		HWREG(UART7_BASE + UART_O_DR) = DataByte; 
 	}else{
-		printf("Fifo not empty\r\n");
+		printf("Fifo not empty: Transmit_SM \r\n");
 	}	
 }
 

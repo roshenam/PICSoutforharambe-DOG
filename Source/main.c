@@ -37,7 +37,8 @@ int main(void)
 	printf("\n\r\n");
 	
 	printf("------------------------MAPKEYS--------------------------------\n\r");
-	printf("D: ES_CONSTRUCT_DOG_ACK \n\r");
+	printf("D: Send a DOG ACK \n\r");
+	printf("S: Unpair & Stop Hovering \n\r");
 	printf("---------------------------------------------------------------\n\r");
 	printf("\n\r");
 

@@ -41,14 +41,17 @@
 #include "HoverControl_Module.h"
 #include "Constants.h"
 #include "Comm_Service.h"
+#include "Transmit_SM.h"
+#include "LiftFan_Service.h"
+
 
 /********************Module Defines*******************************************/
 //Port A
-#define LIFT_FAN_PORT	GPIO_PORTA_BASE
-#define LIFT_FAN_PIN	GPIO_PIN_2
+
 
 //Port B
-
+#define PIC_PORT	GPIO_PORTA_BASE
+#define PIC_PIN	  GPIO_PIN_0
 
 //Port C
 

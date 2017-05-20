@@ -7,8 +7,6 @@
 
 typedef enum {Waiting2Pair, Paired_Waiting4Key, Paired  } DOGState_t ;
 
-uint8_t GetPairedFarmerLSB(void);
-uint8_t GetPairedFarmerMSB(void);
 
 bool InitDOG_SM ( uint8_t Priority );
 bool PostDOG_SM( ES_Event ThisEvent );
