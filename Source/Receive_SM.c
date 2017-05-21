@@ -152,7 +152,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
 					printf("------------RECEIVING----------------------\n\r");
-					printf("Start: %i\n\r", ThisEvent.EventParam);
+					//printf("Start: %i\n\r", ThisEvent.EventParam);
 					// start timer 
 					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
 					
@@ -170,7 +170,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("MSB: %i\n\r", ThisEvent.EventParam);
+				//printf("MSB: %i\n\r", ThisEvent.EventParam);
 				// store MSB in data packet 
 				MSBLength = ThisEvent.EventParam; 
 				// start receive timer
@@ -188,7 +188,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("LSB: %i\r\n", ThisEvent.EventParam);
+				//printf("LSB: %i\r\n", ThisEvent.EventParam);
 				// store LSB in data packet 
 				LSBLength = ThisEvent.EventParam; 
 				
@@ -219,7 +219,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("Data: %i\n\r", ThisEvent.EventParam);
+				//printf("Data: %i\n\r", ThisEvent.EventParam);
 
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {

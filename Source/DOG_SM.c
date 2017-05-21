@@ -199,7 +199,9 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 					if (DecryptedFarmerCommands[0] == FARMER_DOG_CTRL) {
 						//executed commands as required
 						DirectionSpeed = DecryptedFarmerCommands[1];
+						printf("DirectionSpeed: %i\r\n", DirectionSpeed);
 						Turning = DecryptedFarmerCommands[2];
+						printf("Turning: %i\r\n", Turning);
 						switch (DecryptedFarmerCommands[3]) {
 							case 0x00:
 								Peripheral = OFF;

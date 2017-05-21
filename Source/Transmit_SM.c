@@ -161,7 +161,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 				// send first byte of array 
 				uint8_t CurrentByte = *(DataToSend+index);
 				SendByte(CurrentByte);
-				printf("START XMIT: %i\n\r", CurrentByte);
+				//printf("START XMIT: %i\n\r", CurrentByte);
 
 				// increment index 
 				index++;
@@ -203,7 +203,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-          printf("XMIT DATA: %i\n\r", CurrentByte);
+          //printf("XMIT DATA: %i\n\r", CurrentByte);
 					// increment index 
 					index++;
 
