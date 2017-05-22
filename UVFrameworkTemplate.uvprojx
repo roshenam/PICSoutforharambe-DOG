@@ -606,6 +606,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\LiftFan_Service.c</FilePath>
             </File>
+            <File>
+              <FileName>PWM_Module.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\PWM_Module.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -765,6 +770,11 @@
               <FileName>LiftFan_Service.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\LiftFan_Service.h</FilePath>
+            </File>
+            <File>
+              <FileName>PWM_Module.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\PWM_Module.h</FilePath>
             </File>
           </Files>
         </Group>

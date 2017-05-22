@@ -35,6 +35,16 @@
 
 /*---------------------------- Module Variables ---------------------------*/
 
+static bool IsLiftFanOn = false;
+static uint8_t AverageDuty;
+static uint8_t Polarity;
+static uint8_t RightDuty;
+static uint8_t LeftDuty;
+
+/*---------------------------- Module Functions ---------------------------*/
+void CalculateAverageDuty(uint8_t DirectionBit);
+void CalculateRequestedDuties(uint8_t DifferentialCalculated, bool IsTurningLeft);
+
 /*------------------------------ Module Code ------------------------------*/
 
 
@@ -42,29 +52,105 @@ void ActivateHover(void) {
   ES_Event ThisEvent;
 	ThisEvent.EventType = ES_HOVER_ON;
 	PostLiftFan_Service(ThisEvent);
+	IsLiftFanOn = true;
 }
 
 void DeactivateHover(void) {
   ES_Event ThisEvent;
 	ThisEvent.EventType = ES_HOVER_OFF;
 	PostLiftFan_Service(ThisEvent);
+	IsLiftFanOn = false;
 	
 	//Also Deactivate Thrust Fans
+	SetDuty(OFF, PWM_FORWARD_POL, MOTOR_LEFT_PWM);
+	SetDuty(OFF, PWM_FORWARD_POL, MOTOR_RIGHT_PWM);
 }
 
-
-void ActivateTurning(uint8_t Turning) {
-}
-
-
-void ActivateDirectionSpeed(uint8_t DirectionSpeed) {
+void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
+	//find average duty and forward/reverse polarity
+	CalculateAverageDuty(DirectionSpeed);
+	
+	//find duty differential between the two motors for turning action
+	uint8_t Differential;
+	
+	if (Turning == 127) {
+		Differential = 0;
+		LeftDuty = AverageDuty;
+		RightDuty = AverageDuty;
+	} else if (Turning > 127) {
+		//max leftward control
+		Differential = ((Turning-127)*100) / (255-127);
+		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
+		CalculateRequestedDuties(Differential, true);
+	} else { //turn right
+		Differential = AverageDuty = ((DirectionSpeed)*100) / (127);
+		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
+		CalculateRequestedDuties(Differential, false);
+	}
+	
+	//Set the duty and direction
+	SetDuty(LeftDuty, Polarity, MOTOR_LEFT_PWM);
+	SetDuty(RightDuty, Polarity, MOTOR_RIGHT_PWM);
 } 
 
 void ActivatePeripheral(uint8_t Peripheral) {
 }
 
 void ActivateBrake(uint8_t Brake) {
+	if ((Brake == OFF) && (IsLiftFanOn == false)) {
+		ActivateHover();
+	} else if ((Brake == ON) && (IsLiftFanOn == true)) {
+		DeactivateHover();
+	}
 }
+
+/********PRIVATE FUNCTIONS**************/
+
+void CalculateAverageDuty(uint8_t DirectionBit) {
+	if (DirectionBit == 127) {
+		AverageDuty = OFF;
+		Polarity = PWM_FORWARD_POL;
+	} else if (DirectionBit > 127) {
+		AverageDuty = ((DirectionBit-127)*100) / (255-127);
+		Polarity = PWM_FORWARD_POL;
+	} else {
+		AverageDuty = ((DirectionBit)*100) / (127);
+		AverageDuty = 100 - AverageDuty;
+		Polarity = PWM_REVERSE_POL;
+	}
+}
+
+void CalculateRequestedDuties(uint8_t DifferentialCalculated, bool IsTurningLeft) {
+	if (IsTurningLeft == true) {
+		if (AverageDuty < DifferentialCalculated) {
+			LeftDuty = 0;
+		} else {
+			LeftDuty = AverageDuty - DifferentialCalculated;
+		}
+		
+		//calcaulate right differential
+		if (AverageDuty > DifferentialCalculated) {
+			RightDuty = 100;
+		} else {
+			RightDuty = AverageDuty + DifferentialCalculated;
+		}
+	} else {
+		if (AverageDuty < DifferentialCalculated) {
+			RightDuty = 0;
+		} else {
+			RightDuty = AverageDuty - DifferentialCalculated;
+		}
+		
+		//calcaulate right differential
+		if (AverageDuty > DifferentialCalculated) {
+			LeftDuty = 100;
+		} else {
+			LeftDuty = AverageDuty + DifferentialCalculated;
+		}
+	}	
+}
+
+
 
 
 

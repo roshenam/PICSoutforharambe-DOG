@@ -43,6 +43,7 @@
 #include "Comm_Service.h"
 #include "Transmit_SM.h"
 #include "LiftFan_Service.h"
+#include "PWM_Module.h"
 
 
 /********************Module Defines*******************************************/
@@ -50,8 +51,17 @@
 
 
 //Port B
-#define PIC_PORT	GPIO_PORTA_BASE
-#define PIC_PIN	  GPIO_PIN_0
+#define PIC_PORT					GPIO_PORTB_BASE
+#define PIC_PIN	  				GPIO_PIN_0
+
+#define MOTOR_PORT 		    GPIO_PORTB_BASE
+#define MOTOR_LEFT_EF			GPIO_PIN_2
+#define MOTOR_RIGHT_EF		GPIO_PIN_3
+#define MOTOR_LEFT_0_PIN	GPIO_PIN_6
+#define MOTOR_LEFT_1_PIN  GPIO_PIN_7
+#define MOTOR_RIGHT_0_PIN GPIO_PIN_4
+#define MOTOR_RIGHT_1_PIN GPIO_PIN_5
+
 
 //Port C
 
@@ -63,6 +73,10 @@
 
 #define RX_PIN	BIT0HI 	// UART7 Rx: PE0
 #define TX_PIN	BIT1HI	// UART7 Tx: PE1
+
+#define SERVO_PORT				GPIO_PORTE_BASE
+#define SERVO_PIN					GPIO_PIN_4
+
 //Port F
 
 

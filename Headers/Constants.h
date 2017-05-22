@@ -28,6 +28,9 @@
 #define HI											  1
 #define LO											  0
 
+#define ON												1
+#define OFF												0
+
 //Data Packet Types
 #define DOG_FARMER_REPORT         0x00
 #define FARMER_DOG_REQ_2_PAIR     0x01
@@ -42,13 +45,16 @@
 #define API_IDENTIFIER_Rx         0x81
 #define API_IDENTIFIER_Tx_Result  0x89
 #define API_IDENTIFIER_Reset			0x8A
-#define MAX_FRAME_LENGTH          40
 #define START_DELIMITER 					0x7E
 #define OPTIONS										0x00
 
 //frame lengths
 #define ACK_N_ENCRYPT_FRAME_LEN		6
 #define STATUS_FRAME_LEN					18 //13 bytes + 5 header type bytes in frame data
+#define HEADER_LENGTH							3
+#define MAX_PACKET_LENGTH         45
+#define FARMER_CMD_LENGTH					4 //header and data bytes 
+
 
 //Tx Packet
 #define START_BYTE_INDEX					0
@@ -61,7 +67,7 @@
 #define OPTIONS_BYTE_INDEX_TX     7
 #define PACKET_TYPE_BYTE_INDEX_TX 8 
 
-#define HEADER_LENGTH							3
+#define IMU_DATA_NUM_BYTES				12
 
 //Rx Packet
 #define API_IDENT_BYTE_INDEX_RX   0
@@ -75,18 +81,35 @@
 
 #define PACKET_TYPE_BYTE_INDEX_RX	5
 #define DOG_TAG_BYTE_INDEX        6  
+
+#define ENCRYPTION_KEY_LENGTH			32
+
+#define DIGITAL_MASK							0x03
  
 
 //Result from Transmit Packet
 #define SUCCESS										0
 
-// Servo
+// Actuators
+
+#define MOTOR_LEFT_PWM						0
+#define MOTOR_RIGHT_PWM						1
+#define SERVO_PWM									2
+
+#define PWM_FORWARD_POL						0
+#define PWM_REVERSE_POL						1
+
 #define SERVO_MAX_PULSE						2000 // uS
 #define SERVO_MIN_PULSE						1000 // uS
 
+#define MAX_TURNING_DIFF_DIVISOR	3 //100/MAX --> DIVISOR
 
-//Game Time
-#define GAME_TIME									138
+
+//Timers
+#define ONE_SEC										976
+#define GAME_TIME									218*ONE_SEC
+#define INTER_MESSAGE_TIME				300	// FARMER transmits a packet every 300 ms 
+#define LOST_COMM_TIME						ONE_SEC // DOG+FARMER unpair if no message received after 1 second
 
 //Interrupts
 #define PRIORITY_0 								0

@@ -319,7 +319,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TIMER0_RESP_FUNC PostReceive_SM
 #define TIMER1_RESP_FUNC PostDOG_SM
 #define TIMER2_RESP_FUNC PostTransmit_SM
-#define TIMER3_RESP_FUNC TIMER_UNUSED
+#define TIMER3_RESP_FUNC PostDOG_SM
 #define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
@@ -343,7 +343,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define RECEIVE_TIMER 0
 #define GameTimer 1
 #define TRANSMIT_TIMER 2
-//#define TIMER_A 3
+#define LOST_COMM_TIMER 3
 
 
 #endif /* CONFIGURE_H */

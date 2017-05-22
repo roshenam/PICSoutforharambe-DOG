@@ -37,9 +37,9 @@ static uint8_t MSBLength = 0;
 static uint8_t LSBLength = 0;
 static uint8_t FrameLength = 0; // num bytes in data frame
 static uint8_t BytesLeft = 0;
-static uint8_t CheckSum = 0;
+static uint8_t RunningSum = 0;
 
-static uint8_t DataPacket[MAX_FRAME_LENGTH]; // array containing all bytes in data packet
+static uint8_t DataPacket[MAX_PACKET_LENGTH]; // array containing all bytes in data packet
 static uint8_t ArrayIndex = 0;
 
 static uint8_t *outgoingDataPacket; //pointer to data packet
@@ -202,8 +202,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				// set ArrayIndex to 0 
 				ArrayIndex = 0;
 				
-				// initialize CheckSum to 0
-				CheckSum = 0;
+				// initialize runningsum to 0
+				RunningSum = 0;
 				
 				// set current state to ReceivingData
 				CurrentState = ReceivingData;
@@ -224,7 +224,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
 					printf("CheckSum: %i\r\n", ThisEvent.EventParam);
-					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
+					if (ThisEvent.EventParam == (0xFF - RunningSum)) {
 						//printf("Checksum is good: ReceiveSM");
 						// if good checksum, post PacketReceived event to FARMER_SM
 						ES_Event ThisEvent;         
@@ -250,7 +250,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				ArrayIndex++;
 				
 				// update check sum
-				CheckSum += CurrentByte;
+				RunningSum += CurrentByte;
 				
 				// decrement Bytes left 
 				BytesLeft--;
