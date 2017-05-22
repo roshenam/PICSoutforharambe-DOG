@@ -114,14 +114,18 @@ void InitPWM(void) {
 // the load register to 1/2 the desired total period. We will also program
 // the match compare registers to 1/2 the desired high time  
   HWREG( PWM0_BASE+PWM_O_0_LOAD) = ((PeriodMS_Motors))>>1;
-	HWREG( PWM0_BASE+PWM_O_1_LOAD) = ((PeriodMS_Servo))>>1;
+	HWREG( PWM0_BASE+PWM_O_1_LOAD) = ((PeriodMS_Motors))>>1;
+	HWREG( PWM0_BASE+PWM_O_2_LOAD) = ((PeriodMS_Servo))>>1;
   
 // Set the initial Duty cycle all to 0% 
   HWREG( PWM0_BASE+PWM_O_0_GENA) = GEN0_A_ZERO;
 	HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
 	HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN1_A_ZERO;
 	HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN1_B_ZERO;
-/************WHAT TO DO WITH SERVO??**************/
+	
+	//servo normal
+	HWREG( PWM0_BASE+PWM_O_2_GENA) = GEN2_A_NORM;
+	SendServoHome();
 	
 	// enable the PWM outputs
   HWREG( PWM0_BASE+PWM_O_ENABLE) |= (PWM_ENABLE_PWM0EN | PWM_ENABLE_PWM1EN | PWM_ENABLE_PWM2EN | PWM_ENABLE_PWM3EN | PWM_ENABLE_PWM4EN);
@@ -190,34 +194,32 @@ void SetDuty(uint8_t Duty, uint8_t Polarity, uint8_t Actuator) {
 			break;
 		case MOTOR_RIGHT_PWM:
 			if (Duty == 100) {
-				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_HUNDRED;
-			} else if (Duty == 0) {
-				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
-			} else {
-				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_NORM;
-				uint32_t HiTime = (PeriodMS_Motors) * Duty/100; //calculate the desired high time
-			  HWREG(PWM0_BASE+PWM_O_0_CMPB) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
-			}
-			
-			if (Polarity == PWM_FORWARD_POL) {
-				HWREG( PWM0_BASE+PWM_O_INVERT ) &= ~(PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV);
-			} else if (Polarity == PWM_REVERSE_POL) {
-				HWREG( PWM0_BASE+PWM_O_INVERT ) |= (PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV);
-			}
-			break;
-		case SERVO_PWM:
-			if (Duty == 100) {
 				HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN1_A_HUNDRED;
 			} else if (Duty == 0) {
 				HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN1_A_ZERO;
 			} else {
-				/*********HOW DOES THIS WORK??*********/
 				HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN1_A_NORM;
-				uint32_t HiTime = (PeriodMS_Servo) * Duty/100; //calculate the desired high time
-			  HWREG(PWM0_BASE+PWM_O_1_CMPA) = ((PeriodMS_Servo)/2) - (HiTime/2); //set pwm
+				uint32_t HiTime = (PeriodMS_Motors) * Duty/100; //calculate the desired high time
+			  HWREG(PWM0_BASE+PWM_O_1_CMPA) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
+			}
+			
+			if (Polarity == PWM_FORWARD_POL) {
+				HWREG( PWM0_BASE+PWM_O_INVERT ) &= ~(PWM_INVERT_PWM2INV | PWM_INVERT_PWM3INV);
+			} else if (Polarity == PWM_REVERSE_POL) {
+				HWREG( PWM0_BASE+PWM_O_INVERT ) |= (PWM_INVERT_PWM2INV | PWM_INVERT_PWM3INV);
 			}
 			break;
 	}
+}
+
+void SendServoHome(void) {
+	//HWREG( PWM0_BASE+PWM_O_2_GENA) = GEN2_A_NORM;
+	HWREG(PWM0_BASE+PWM_O_2_CMPA) = ((PeriodMS_Servo)/2) - ((SERVO_MIN_PULSE*PWMTicksPerMS)/2);
+}
+
+void SendServoAway(void) {
+	//HWREG( PWM0_BASE+PWM_O_2_GENA) = GEN2_A_NORM;
+  HWREG(PWM0_BASE+PWM_O_2_CMPA) = ((PeriodMS_Servo)/2) - ((SERVO_MAX_PULSE*PWMTicksPerMS)/2);
 }
 
 

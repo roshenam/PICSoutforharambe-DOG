@@ -69,6 +69,7 @@ void DeactivateHover(void) {
 void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 	//find average duty and forward/reverse polarity
 	CalculateAverageDuty(DirectionSpeed);
+	printf("AverageDuty: %i      Polarity (0 is forward): %i \n\r", AverageDuty, Polarity);
 	
 	//find duty differential between the two motors for turning action
 	uint8_t Differential;
@@ -87,6 +88,8 @@ void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
 		CalculateRequestedDuties(Differential, false);
 	}
+	
+	printf("Differential (max 30): %i     RightDuty: %i     LeftDuty: %i\n\r", Differential, RightDuty, LeftDuty);
 	
 	//Set the duty and direction
 	SetDuty(LeftDuty, Polarity, MOTOR_LEFT_PWM);

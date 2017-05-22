@@ -45,6 +45,8 @@
 #include "LiftFan_Service.h"
 #include "PWM_Module.h"
 
+#include "DogTail_Service.h"
+
 
 /********************Module Defines*******************************************/
 //Port A
