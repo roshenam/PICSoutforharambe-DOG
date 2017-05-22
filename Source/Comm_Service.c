@@ -217,17 +217,20 @@ uint8_t CalculateChecksum (uint8_t FrameLength) {
 	uint8_t RunningSum = 0;
 	uint8_t Checksum = 0;
 	uint8_t numBytes = FrameLength + HEADER_LENGTH;
-	for (int i = 0; i < numBytes; i++) {
+	for (int i = HEADER_LENGTH; i < numBytes; i++) {
 		RunningSum += DataPacket_Tx[i];
 	}
 	Checksum = 0xFF - RunningSum;
+	
+	printf("Running sum: %i\r\n", RunningSum);
+	printf("Check sum: %i\r\n", Checksum);
 	return Checksum;
 }
 
 void ConstructIMUData (void) {
 	uint8_t DataPacketIndex = PACKET_TYPE_BYTE_INDEX_TX + 1;
 	for (int i = 0; i < IMU_DATA_NUM_BYTES; i++) {
-		DataPacket_Tx[DataPacketIndex + i] = *(IMU_Data + i);
+		DataPacket_Tx[DataPacketIndex + i] = 2; //*(IMU_Data + i);
 	}
 }
 

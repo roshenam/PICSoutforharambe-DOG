@@ -35,17 +35,23 @@
 #define PeriodInMS_Servo 20
 #define PeriodMS_Servo PeriodInMS_Servo * PWMTicksPerMS
 
-#define GEN0_A_NORM (PWM_0_GENA_ACTCMPAU_ONE | PWM_0_GENA_ACTCMPAD_ZERO)
-#define GEN0_B_NORM (PWM_0_GENB_ACTCMPAU_ONE | PWM_0_GENB_ACTCMPBD_ZERO)
-#define GEN1_A_NORM (PWM_1_GENA_ACTCMPAU_ONE | PWM_1_GENA_ACTCMPAD_ZERO)
+#define GEN0_A_NORM (PWM_0_GENA_ACTCMPAU_ONE | PWM_0_GENA_ACTCMPAD_ZERO) //module 0, generator 0, channel A, cmpA
+#define GEN0_B_NORM (PWM_0_GENB_ACTCMPBU_ONE | PWM_0_GENB_ACTCMPBD_ZERO) //module 0, generator 0, channel B, cmpB
+#define GEN1_A_NORM (PWM_1_GENA_ACTCMPAU_ONE | PWM_1_GENA_ACTCMPAD_ZERO) //module 0, generator 1, channel A, cmpA
+#define GEN1_B_NORM (PWM_1_GENB_ACTCMPBU_ONE | PWM_1_GENB_ACTCMPBD_ZERO) //module 0, generator 1, channel B, cmpB
+#define GEN2_A_NORM (PWM_2_GENA_ACTCMPAU_ONE | PWM_2_GENA_ACTCMPAD_ZERO) //module 0, generator 2, channel A, cmpA
 
 #define GEN0_A_ZERO PWM_0_GENA_ACTZERO_ZERO
 #define GEN0_B_ZERO PWM_0_GENB_ACTZERO_ZERO
 #define GEN1_A_ZERO PWM_1_GENA_ACTZERO_ZERO
+#define GEN1_B_ZERO PWM_1_GENB_ACTZERO_ZERO
+#define GEN2_A_ZERO PWM_1_GENA_ACTZERO_ZERO
 
 #define GEN0_A_HUNDRED PWM_0_GENA_ACTZERO_ONE
 #define GEN0_B_HUNDRED PWM_0_GENB_ACTZERO_ONE
 #define GEN1_A_HUNDRED PWM_1_GENA_ACTZERO_ONE
+#define GEN1_B_HUNDRED PWM_1_GENB_ACTZERO_ONE
+#define GEN2_A_HUNDRED PWM_2_GENA_ACTZERO_ONE
 
 //calculate RPM
 #define TicksPerSec 40000000 //40MHz
@@ -57,15 +63,12 @@
 /* prototypes for private functions for this machine. They should be functions
    relevant to the behavior of this state machine
 */
-void InitPWM(void); //init PWM on TIVA
-void SetDuty(uint32_t Duty, uint8_t Actuator); //set the duty of the PWM based on control law
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
 // type of state variable should match htat of enum in header file
 
 // with the introduction of Gen2, we need a module level Priority var as well
-static uint8_t MyPriority;
 //Set the Duty
 
 
@@ -83,7 +86,7 @@ void InitPWM(void) {
 // start by enabling the clock to the PWM Module (PWM0)
   HWREG(SYSCTL_RCGCPWM) |= SYSCTL_RCGCPWM_R0;
 
-// enable the clock to Port B  done elsewhere
+// enable the clock to Port B  and Port E done elsewhere
 	  
 // Select the PWM clock as System Clock/32
   HWREG(SYSCTL_RCC) = (HWREG(SYSCTL_RCC) & ~SYSCTL_RCC_PWMDIV_M) |
@@ -95,13 +98,17 @@ void InitPWM(void) {
 // disable the PWM while initializing
 	//Module 0, Generator 0 (channels A and B or PWM0 and PWM1)
   HWREG( PWM0_BASE+PWM_O_0_CTL ) = 0;
-	//Module 0, Generator 1 (channel A, PWM2)
+	//Module 0, Generator 1 (channel A and B, PWM2 and PWM3)
 	HWREG( PWM0_BASE+PWM_O_1_CTL ) = 0;
+	//Module 0, Generator 2 (channel A and B, PWM4)
+	HWREG( PWM0_BASE+PWM_O_2_CTL ) = 0;
 
+	/* Not doing this because setting them all to zero initially 
 // program generators to go to 1 at rising compare A/B, 0 on falling compare A/B  
   HWREG( PWM0_BASE+PWM_O_0_GENA) = (GEN0_A_NORM );
   HWREG( PWM0_BASE+PWM_O_0_GENB) = (GEN0_B_NORM );
   HWREG( PWM0_BASE+PWM_O_1_GENA) = (GEN1_A_NORM );
+*/
 
 // Set the PWM period. Since we are counting both up & down, we initialize
 // the load register to 1/2 the desired total period. We will also program
@@ -110,28 +117,37 @@ void InitPWM(void) {
 	HWREG( PWM0_BASE+PWM_O_1_LOAD) = ((PeriodMS_Servo))>>1;
   
 // Set the initial Duty cycle all to 0% 
-/********STILL NEED TO DO ***********/
   HWREG( PWM0_BASE+PWM_O_0_GENA) = GEN0_A_ZERO;
 	HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
 	HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN1_A_ZERO;
+	HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN1_B_ZERO;
+/************WHAT TO DO WITH SERVO??**************/
 	
 	// enable the PWM outputs
-  HWREG( PWM0_BASE+PWM_O_ENABLE) |= (PWM_ENABLE_PWM0EN | PWM_ENABLE_PWM1EN | PWM_ENABLE_PWM2EN);
+  HWREG( PWM0_BASE+PWM_O_ENABLE) |= (PWM_ENABLE_PWM0EN | PWM_ENABLE_PWM1EN | PWM_ENABLE_PWM2EN | PWM_ENABLE_PWM3EN | PWM_ENABLE_PWM4EN);
 
 // now configure the Port B pins to be PWM outputs
 // start by selecting the alternate function for 3 pins
-  HWREG(ACTUATOR_PORT+GPIO_O_AFSEL) |= (MOTOR_LEFT_PIN | MOTOR_RIGHT_PIN | SERVO_PIN);
+  HWREG(MOTOR_PORT+GPIO_O_AFSEL) |= (MOTOR_LEFT_0_PIN | MOTOR_LEFT_1_PIN | MOTOR_RIGHT_0_PIN | MOTOR_RIGHT_1_PIN);
+	HWREG(SERVO_PORT+GPIO_O_AFSEL) |= (SERVO_PIN);
+
 
 // now choose to map PWM to those pins, this is a mux value of 4 that we
 // want to use for specifying the function on bits 6 & 7
-  HWREG(ACTUATOR_PORT+GPIO_O_PCTL) = 
-    (HWREG(ACTUATOR_PORT+GPIO_O_PCTL) & 0x00f0ffff) +
-      (4<<(6*BITS_IN_NIBBLE)) + (4<<(7*BITS_IN_NIBBLE)) + (4<<(4*BITS_IN_NIBBLE));;
+  HWREG(MOTOR_PORT+GPIO_O_PCTL) = 
+    (HWREG(MOTOR_PORT+GPIO_O_PCTL) & 0x0000ffff) +
+      (4<<(6*BITS_IN_NIBBLE)) + (4<<(7*BITS_IN_NIBBLE)) + (4<<(4*BITS_IN_NIBBLE)) + (4<<(5*BITS_IN_NIBBLE));
+			
+	HWREG(SERVO_PORT+GPIO_O_PCTL) = 
+    (HWREG(SERVO_PORT+GPIO_O_PCTL) & 0xfff0ffff) +
+      (4<<(4*BITS_IN_NIBBLE));
 
 // Enable pins 6 on Port B for digital I/O
-	InitPin(ACTUATOR_PORT, MOTOR_RIGHT_PIN, OUTPUT);
-	InitPin(ACTUATOR_PORT, MOTOR_LEFT_PIN, OUTPUT);
-	InitPin(ACTUATOR_PORT, SERVO_PIN, OUTPUT);
+	InitPin(MOTOR_PORT, MOTOR_LEFT_0_PIN, OUTPUT);
+	InitPin(MOTOR_PORT, MOTOR_LEFT_1_PIN, OUTPUT);
+	InitPin(MOTOR_PORT, MOTOR_RIGHT_0_PIN, OUTPUT);
+	InitPin(MOTOR_PORT, MOTOR_RIGHT_1_PIN, OUTPUT);
+	InitPin(SERVO_PORT, SERVO_PIN, OUTPUT);
   
 // set the up/down count mode, enable the PWM generator and make
 // both generator updates locally synchronized to zero count
@@ -139,7 +155,10 @@ void InitPWM(void) {
                                     PWM_0_CTL_GENAUPD_LS | PWM_0_CTL_GENBUPD_LS);
 
   HWREG(PWM0_BASE+ PWM_O_1_CTL) = (PWM_1_CTL_MODE | PWM_1_CTL_ENABLE | 
-                                    PWM_1_CTL_GENAUPD_LS);
+                                    PWM_1_CTL_GENAUPD_LS | PWM_0_CTL_GENBUPD_LS);
+																		
+	HWREG(PWM0_BASE+ PWM_O_2_CTL) = (PWM_2_CTL_MODE | PWM_2_CTL_ENABLE | 
+                                    PWM_2_CTL_GENAUPD_LS);
 
 }
 
@@ -148,10 +167,10 @@ void InitPWM(void) {
  Function
     Set the duty of the PWM based off of the control law above
  ***************************************************************************/
-void SetDuty(uint32_t Duty, uint8_t Actuator) {
+void SetDuty(uint8_t Duty, uint8_t Polarity, uint8_t Actuator) {
 	
 	switch (Actuator) {
-		case MOTOR_LEFT_PWM:
+		case MOTOR_LEFT_PWM:			
 			if (Duty == 100) {
 				HWREG( PWM0_BASE+PWM_O_0_GENA) = GEN0_A_HUNDRED;
 			} else if (Duty == 0) {
@@ -161,6 +180,13 @@ void SetDuty(uint32_t Duty, uint8_t Actuator) {
 				uint32_t HiTime = (PeriodMS_Motors) * Duty/100; //calculate the desired high time
 			  HWREG(PWM0_BASE+PWM_O_0_CMPA) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
 			}
+			
+			if (Polarity == PWM_FORWARD_POL) {
+				HWREG( PWM0_BASE+PWM_O_INVERT ) &= ~(PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV);
+			} else if (Polarity == PWM_REVERSE_POL) {
+				HWREG( PWM0_BASE+PWM_O_INVERT ) |= (PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV);
+			}
+			
 			break;
 		case MOTOR_RIGHT_PWM:
 			if (Duty == 100) {
@@ -171,6 +197,12 @@ void SetDuty(uint32_t Duty, uint8_t Actuator) {
 				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_NORM;
 				uint32_t HiTime = (PeriodMS_Motors) * Duty/100; //calculate the desired high time
 			  HWREG(PWM0_BASE+PWM_O_0_CMPB) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
+			}
+			
+			if (Polarity == PWM_FORWARD_POL) {
+				HWREG( PWM0_BASE+PWM_O_INVERT ) &= ~(PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV);
+			} else if (Polarity == PWM_REVERSE_POL) {
+				HWREG( PWM0_BASE+PWM_O_INVERT ) |= (PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV);
 			}
 			break;
 		case SERVO_PWM:

@@ -18,8 +18,7 @@
 // Public Function Prototypes
 void ActivateHover(void);
 void DeactivateHover(void);
-void ActivateTurning(uint8_t Turning);
-void ActivateDirectionSpeed(uint8_t DirectionSpeed);
+void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning);
 void ActivatePeripheral(uint8_t Peripheral);
 void ActivateBrake(uint8_t Brake);
 
