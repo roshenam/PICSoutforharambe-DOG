@@ -199,8 +199,11 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 					if (DecryptedFarmerCommands[0] == FARMER_DOG_CTRL) {
 						//executed commands as required
 						DirectionSpeed = DecryptedFarmerCommands[1];
+						printf("DECRYPTED Direction/Speed: %i \n\r", DirectionSpeed);
 						Turning = DecryptedFarmerCommands[2];
-						switch (DecryptedFarmerCommands[3]) {
+						printf("DECRYPTED Turning: %i \n\r", Turning);
+						//printf("DECRYPTED Digital: %i \n\r", DecryptedFarmerCommands[3]);
+						switch ((DecryptedFarmerCommands[3] & DIGITAL_MASK)) {
 							case 0x00:
 								Peripheral = OFF;
 								Brake = OFF;
@@ -217,8 +220,15 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 								Peripheral = ON;
 								Brake = ON;
 								break;
-						} 
-						ActivateDirectionSpeed(DirectionSpeed, Turning);
+							default:
+								Peripheral = OFF;
+								Brake = OFF;
+							break;
+						}
+						printf("DECRYPTED Peripheral: %i \n\r", Peripheral);
+						printf("DECRYPTED Brake: %i \n\r", Brake);
+						ActivateDirectionSpeed(DirectionSpeed);
+						ActivateTurning(Turning);
 						ActivatePeripheral(Peripheral);
 						ActivateBrake(Brake);
 						
