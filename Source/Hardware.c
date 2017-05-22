@@ -41,7 +41,6 @@
 void InitGPIOPins(void);
 void InitPorts(void);
 void InitInterrupts(void);
-void InitPWM(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 
@@ -78,7 +77,7 @@ void InitAll (void) {
 	InitPorts();
 	InitGPIOPins(); 
 	InitInterrupts();
-	InitPWM();
+	InitPWM(); //from PWM module
 	//etc....
 }
 
@@ -107,17 +106,12 @@ void InitGPIOPins(void) {
 	InitPin (PIC_PORT, PIC_PIN, OUTPUT);
 	SetOutput (PIC_PORT, PIC_PIN, LO);
 		
-	//initialize pins
+	//motor error flags
+	InitPin (MOTOR_PORT, MOTOR_LEFT_EF, INPUT);
+	InitPin (MOTOR_PORT, MOTOR_RIGHT_EF, INPUT);
+	
   
 }
-
-
-void InitPWM(void) { 
-	//pwm for 2 motors and servo
-}
-
-
-
 
 /*************INTERRUPTS*******************/
 

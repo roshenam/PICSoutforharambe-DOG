@@ -88,9 +88,19 @@
 //Result from Transmit Packet
 #define SUCCESS										0
 
-// Servo
+// Actuators
+
+#define MOTOR_LEFT_PWM						0
+#define MOTOR_RIGHT_PWM						1
+#define SERVO_PWM									2
+
+#define PWM_FORWARD_POL						0
+#define PWM_REVERSE_POL						1
+
 #define SERVO_MAX_PULSE						2000 // uS
 #define SERVO_MIN_PULSE						1000 // uS
+
+#define MAX_TURNING_DIFF_DIVISOR	3 //100/MAX --> DIVISOR
 
 
 //Timers

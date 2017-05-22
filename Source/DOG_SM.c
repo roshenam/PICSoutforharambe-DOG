@@ -82,7 +82,7 @@ bool InitDOG_SM ( uint8_t Priority )
   CurrentState = Waiting2Pair;
 
   //GET DOG TAG NUMBER
-	DogTag = 0;
+	DogTag = 26;
 	//DogTag = ReadPin();
 	printf("DOGTAG#: %i \n\r", DogTag);
 	
@@ -218,8 +218,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 								Brake = ON;
 								break;
 						} 
-						ActivateDirectionSpeed(DirectionSpeed);
-						ActivateTurning(Turning);
+						ActivateDirectionSpeed(DirectionSpeed, Turning);
 						ActivatePeripheral(Peripheral);
 						ActivateBrake(Brake);
 						
