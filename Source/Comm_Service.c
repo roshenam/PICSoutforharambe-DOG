@@ -122,12 +122,15 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 						uint8_t PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
 						switch (PacketType) {
 							case FARMER_DOG_REQ_2_PAIR :
+								printf("received REQ2PAIR\r\n");
 								NewEvent.EventType = ES_PAIR_REQUEST_RECEIVED;
 								break;
 							case FARMER_DOG_ENCR_KEY :
+								printf("received ENCR KEY \r\n");
 								NewEvent.EventType = ES_ENCRYPTION_KEY_RECEIVED;
 								break;
 							default :
+								printf("received CMD\r\n");
 								NewEvent.EventType = ES_NEW_CMD_RECEIVED;
 								break;
 						}
