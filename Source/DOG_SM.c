@@ -141,6 +141,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 
 	if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
 																						&& ThisEvent.EventParam == LOST_COMM_TIMER)) {
+	  printf("Lost Comm Timer Timeout \n\r");
 		DeactivateHover();
 		NextState = Waiting2Pair;
 		StopWagging();

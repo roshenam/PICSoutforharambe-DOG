@@ -129,6 +129,11 @@ ES_Event RunMapKeys( ES_Event ThisEvent )
 							printf("UNPAIR & STOP HOVERING \n\r");
 							NewEvent.EventType = ES_UNPAIR;
 							PostDOG_SM(NewEvent);
+						break;
+						
+						case 'P' :
+							printf("PWM TEST \n\r");
+							ActivateDirectionSpeed(200, 100);
         }
     
     }

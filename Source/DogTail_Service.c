@@ -59,7 +59,7 @@ void DecidePosition(void);
 static uint8_t MyPriority;
 
 static bool Position = true;
-
+static bool IsWagOn = false;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -86,6 +86,7 @@ bool InitDogTail_Service ( uint8_t Priority )
   MyPriority = Priority;
   SendServoHome();
 	Position = true;
+	IsWagOn = false;
 	
   return true;
 }
@@ -137,19 +138,24 @@ ES_Event RunDogTail_Service( ES_Event ThisEvent )
   switch (ThisEvent.EventType){
 		case ES_STOP_WAGGING :
 			printf("turn wagging off\r\n");
+			IsWagOn = false;
+			SendServoHome();
 			break;
 		
 		case ES_START_WAGGING :
 			printf("turn wag on \n\r");
+			IsWagOn = true;
 			DecidePosition();
 		  ES_Timer_InitTimer(WAG_TIMER, WAG_TIME);
 			break;
 		
-    case ES_TIMEOUT :  
-			if (ThisEvent.EventParam == WAG_TIMER) {
+    case ES_TIMEOUT :
+      if ((ThisEvent.EventParam == WAG_TIMER) && (IsWagOn == true)) {
+				//printf("WAG");
 				DecidePosition(); 
 				ES_Timer_InitTimer(WAG_TIMER, WAG_TIME);
 			}
+			
       break;
   }
   return ReturnEvent;

@@ -71,6 +71,8 @@ void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 	CalculateAverageDuty(DirectionSpeed);
 	printf("AverageDuty: %i      Polarity (0 is forward): %i \n\r", AverageDuty, Polarity);
 	
+	uint8_t Differential = 0;
+	/*
 	//find duty differential between the two motors for turning action
 	uint8_t Differential;
 	
@@ -88,6 +90,7 @@ void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
 		CalculateRequestedDuties(Differential, false);
 	}
+	*/
 	
 	printf("Differential (max 30): %i     RightDuty: %i     LeftDuty: %i\n\r", Differential, RightDuty, LeftDuty);
 	
