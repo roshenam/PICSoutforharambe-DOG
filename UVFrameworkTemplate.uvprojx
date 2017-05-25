@@ -611,6 +611,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\PWM_Module.c</FilePath>
             </File>
+            <File>
+              <FileName>SPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\SPI.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -775,6 +780,11 @@
               <FileName>PWM_Module.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\PWM_Module.h</FilePath>
+            </File>
+            <File>
+              <FileName>SPI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\SPI.h</FilePath>
             </File>
           </Files>
         </Group>

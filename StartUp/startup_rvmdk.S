@@ -82,6 +82,7 @@ __heap_limit
         EXTERN  ShortTimerAHandler
         EXTERN  ShortTimerBHandler
 		EXTERN  UART_ISR
+	  EXTERN SPI_ISR
 ;        EXTERN  UARTStdioIntHandler
 
 ;******************************************************************************
@@ -141,7 +142,7 @@ __Vectors
         DCD     IntDefaultHandler           ; GPIO Port G
         DCD     IntDefaultHandler           ; GPIO Port H
         DCD     IntDefaultHandler           ; UART2 Rx and Tx
-        DCD     IntDefaultHandler           ; SSI1 Rx and Tx
+        DCD     SPI_ISR		              ; SSI1 Rx and Tx
         DCD     IntDefaultHandler           ; Timer 3 subtimer A
         DCD     IntDefaultHandler           ; Timer 3 subtimer B
         DCD     IntDefaultHandler           ; I2C1 Master and Slave

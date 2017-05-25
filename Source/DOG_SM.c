@@ -227,8 +227,8 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						}
 						printf("DECRYPTED Peripheral: %i \n\r", Peripheral);
 						printf("DECRYPTED Brake: %i \n\r", Brake);
-						ActivateDirectionSpeed(DirectionSpeed);
-						ActivateTurning(Turning);
+						//ActivateDirectionSpeed(DirectionSpeed);
+						//ActivateTurning(Turning);
 						ActivatePeripheral(Peripheral);
 						ActivateBrake(Brake);
 						

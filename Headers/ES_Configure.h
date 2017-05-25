@@ -268,7 +268,9 @@ typedef enum {  ES_NO_EVENT = 0,
 								//Transmit_SM
 								ES_START_XMIT, ES_BYTE_SENT,
 								// Hover
-								ES_HOVER_ON, ES_HOVER_OFF
+								ES_HOVER_ON, ES_HOVER_OFF,
+								// SPI end of transmit
+								ES_EOT
 } ES_EventTyp_t ;
 
 /****************************************************************************/
@@ -320,7 +322,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TIMER1_RESP_FUNC PostDOG_SM
 #define TIMER2_RESP_FUNC PostTransmit_SM
 #define TIMER3_RESP_FUNC PostDOG_SM
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER4_RESP_FUNC PostIMU_Service
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -344,6 +346,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define GameTimer 1
 #define TRANSMIT_TIMER 2
 #define LOST_COMM_TIMER 3
+#define IMU_TIMER 4
 
 
 #endif /* CONFIGURE_H */
