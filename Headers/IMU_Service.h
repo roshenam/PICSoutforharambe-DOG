@@ -12,6 +12,7 @@
 #include "ES_Types.h"
 
 // Public Function Prototypes
+typedef enum {Initializing_IMU, Ready_IMU  } IMUState_t ;
 
 bool InitIMU_Service ( uint8_t Priority );
 bool PostIMU_Service( ES_Event ThisEvent );
