@@ -102,8 +102,8 @@
 #define SERVO_MAX_PULSE						2 // mS
 #define SERVO_MIN_PULSE						1 // mS
 
-#define MAX_TURNING_DIFF_DIVISOR	3 //100/MAX --> DIVISOR
-
+#define MAX_TURNING_DIFF_DIVISOR	1 //100/MAX --> DIVISOR
+#define DEADBAND									20
 
 //Timers
 #define ONE_SEC										976

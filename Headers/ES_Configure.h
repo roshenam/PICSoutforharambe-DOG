@@ -269,7 +269,7 @@ typedef enum {  ES_NO_EVENT = 0,
 								ES_START_XMIT, ES_BYTE_SENT,
 								// Hover
 								ES_HOVER_ON, ES_HOVER_OFF,
-								ES_STOP_WAGGING, ES_START_WAGGING
+								ES_STOP_WAGGING, ES_START_WAGGING,
 								// SPI end of transmit
 								ES_EOT
 } ES_EventTyp_t ;

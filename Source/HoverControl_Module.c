@@ -75,19 +75,19 @@ void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 	//find duty differential between the two motors for turning action
 	uint8_t Differential = 0;
 
-	if (Turning == 127) {
-		Differential = 0;
-		LeftDuty = AverageDuty;
-		RightDuty = AverageDuty;
-	} else if (Turning > 127) {
+	 if (Turning > (127 + DEADBAND)) {
 		//max leftward control
 		Differential = ((Turning-127)*100) / (255-127);
 		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
 		CalculateRequestedDuties(Differential, true); //boolean - true means turning left
-	} else { //turn right
+	} else if (Turning < (127 - DEADBAND)) { //turn right
 		Differential = ((Turning)*100) / (127);
 		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
 		CalculateRequestedDuties(Differential, false); //boolean - false means turning right
+	} else {
+		Differential = 0;
+		LeftDuty = AverageDuty;
+		RightDuty = AverageDuty;
 	}
 	
 	printf("Differential (max +/- 15): %i     RightDuty: %i     LeftDuty: %i\n\r", Differential, RightDuty, LeftDuty);
@@ -118,9 +118,12 @@ void CalculateAverageDuty(uint8_t DirectionBit) {
 		AverageDuty = ((DirectionBit-127)*100) / (255-127);
 		Polarity = PWM_FORWARD_POL;
 	} else {
+		AverageDuty = OFF;
+		Polarity = PWM_FORWARD_POL;
+		/*
 		AverageDuty = ((DirectionBit)*100) / (127);
 		AverageDuty = 100 - AverageDuty;
-		Polarity = PWM_REVERSE_POL;
+		Polarity = PWM_REVERSE_POL; */
 	}
 }
 

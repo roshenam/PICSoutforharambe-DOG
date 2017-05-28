@@ -174,44 +174,42 @@ void SetDuty(uint8_t Duty, uint8_t Polarity, uint8_t Actuator) {
 	switch (Actuator) {
 		case MOTOR_LEFT_PWM:			
 			if (Duty == 100) {
-				HWREG( PWM0_BASE+PWM_O_0_GENA) = GEN0_A_HUNDRED;
-				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
+				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_HUNDRED;
+				//HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
 				//printf("DUTY = 100 IN PWMMODULE \n\r");
 			} else if (Duty == 0) {
-				HWREG( PWM0_BASE+PWM_O_0_GENA) = GEN0_A_ZERO;
 				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
+				//HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
 			} else {
-				HWREG( PWM0_BASE+PWM_O_0_GENA) = GEN0_A_NORM;
-				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
+				HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_NORM;
+				//HWREG( PWM0_BASE+PWM_O_0_GENB) = GEN0_B_ZERO;
 				uint32_t HiTime = (PeriodMS_Motors) * Duty/100; //calculate the desired high time
-			  HWREG(PWM0_BASE+PWM_O_0_CMPA) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
+			  HWREG(PWM0_BASE+PWM_O_0_CMPB) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
 			}
 			
 			break;
 		case MOTOR_RIGHT_PWM:
 			if (Duty == 100) {
-				HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN0_A_HUNDRED;
-				HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN0_B_ZERO;
+				HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN0_B_HUNDRED;
 				//printf("DUTY = 100 IN PWMMODULE \n\r");
 			} else if (Duty == 0) {
-				HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN0_A_ZERO;
 				HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN0_B_ZERO;
 			} else {
-				HWREG( PWM0_BASE+PWM_O_1_GENA) = GEN0_A_NORM;
-				HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN0_B_ZERO;
+				HWREG( PWM0_BASE+PWM_O_1_GENB) = GEN0_B_NORM;
 				uint32_t HiTime = (PeriodMS_Motors) * Duty/100; //calculate the desired high time
-			  HWREG(PWM0_BASE+PWM_O_1_CMPA) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
+			  HWREG(PWM0_BASE+PWM_O_1_CMPB) = ((PeriodMS_Motors)/2) - (HiTime/2); //set pwm
 			}
 			
 			break;	
 	}
 	
+	/*
 	//set the right polarity
 	if (Polarity == PWM_FORWARD_POL) {
 		HWREG( PWM0_BASE+PWM_O_INVERT ) &= ~(PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV | PWM_INVERT_PWM2INV | PWM_INVERT_PWM3INV);
 	} else if (Polarity == PWM_REVERSE_POL) {
 		HWREG( PWM0_BASE+PWM_O_INVERT ) |= (PWM_INVERT_PWM0INV | PWM_INVERT_PWM1INV | PWM_INVERT_PWM2INV | PWM_INVERT_PWM3INV);
-	} 
+	} */
 }
 
 void SendServoHome(void) {

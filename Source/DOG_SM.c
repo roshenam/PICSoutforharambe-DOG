@@ -22,23 +22,27 @@
 #include "DOG_SM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
-
+#define	DOG_TAG GPIO_PIN_3
+#define HowMany 1
 
 /*---------------------------- Module Functions ---------------------------*/
 void StoreEncryptionKey(void);
 void TransmitStatus(void);
-void DecodeCommandMessage(void);
 void TransmitAck(void);
 void TransmitResetEncryption(void);
 void StopWagging(void);
 void StartWagging(void);
-
+void InitDogTag(void);
+void DecodeCommandMessage(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t MyPriority;
 static DOGState_t CurrentState;
 
 static uint8_t DogTag = 0;
+static uint32_t ADResults[1];
+static uint32_t CurrentDogTagVal;
+static double MaxVoltage = 3.3;
 
 static uint8_t* DataPacket_Rx;
 static uint8_t  DecryptedFarmerCommands[FARMER_CMD_LENGTH]; //header and data bytes
@@ -83,11 +87,11 @@ bool InitDOG_SM ( uint8_t Priority )
   // put us into the Initial PseudoState
   CurrentState = Waiting2Pair;
 
-  //GET DOG TAG NUMBER
-	DogTag = 26;
-	//DogTag = ReadPin();
-	printf("DOGTAG#: %i \n\r", DogTag);
-	
+//GET DOG TAG NUMBER
+	InitDogTag();
+	DogTag = GetDogTag();
+	DogTag = 3;
+	printf("DOGTAG#: %i \n\r", DogTag);	
 	InitAll(); //initialize all hardware (ports, pins, interrupts)
 	
 	
@@ -139,17 +143,22 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
 	DOGState_t NextState;
 
-	if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
-																						&& ThisEvent.EventParam == LOST_COMM_TIMER)) {
-	  printf("Lost Comm Timer Timeout \n\r");
-		DeactivateHover();
-		NextState = Waiting2Pair;
-		StopWagging();
-	} 
+	/*
+	printf("Event was posted \n\r");
+  if (CurrentState == Waiting2Pair) {
+		printf("Waiting 2 Pair \n\r");
+	} else if (CurrentState == Paired_Waiting4Key) {
+		printf("Paired_Waiting4Key \n\r");
+	} else if (CurrentState == Paired) {
+		printf("Paired \n\r");
+	} else {
+		printf("THERES A FOURTH STATE! \n\r");
+	} */
 	
-  switch ( CurrentState )
+	switch ( CurrentState )
   {
     case Waiting2Pair : 
+			printf("waiting 2 pair state \n\r");
 			
 				//initialize encryption key index
 				EncryptionKey_Index = 0;
@@ -174,11 +183,14 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 						
             NextState = Paired_Waiting4Key;
-          }
-        }						
+          } 
+        } else {
+						NextState = Waiting2Pair;
+				} 
     break;
 
-    case Paired_Waiting4Key:   
+    case Paired_Waiting4Key: 
+				printf("Paired Waiting4Key \n\r");
 				if (ThisEvent.EventType == ES_ENCRYPTION_KEY_RECEIVED) {
 					DataPacket_Rx = GetDataPacket();
 					StoreEncryptionKey();
@@ -192,10 +204,19 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 					StartWagging();
 					
 					NextState = Paired;
-				}      
+				} else if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
+																						&& ThisEvent.EventParam == LOST_COMM_TIMER)) {
+						printf("Lost Comm Timer Timeout \n\r");
+						DeactivateHover();
+						NextState = Waiting2Pair;
+						StopWagging();
+				} else {
+					NextState = Paired_Waiting4Key;
+				}					
     break;
 
 		case Paired:
+				printf("Paired \n\r");
 				if ( ThisEvent.EventType == ES_NEW_CMD_RECEIVED) {
 					DataPacket_Rx = GetDataPacket();
 					//start the lost-communications timer for 1s
@@ -206,9 +227,9 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 					if (DecryptedFarmerCommands[0] == FARMER_DOG_CTRL) {
 						//executed commands as required
 						DirectionSpeed = DecryptedFarmerCommands[1];
-						printf("DECRYPTED Direction/Speed: %i \n\r", DirectionSpeed);
+						//printf("DECRYPTED Direction/Speed: %i \n\r", DirectionSpeed);
 						Turning = DecryptedFarmerCommands[2];
-						printf("DECRYPTED Turning: %i \n\r", Turning);
+						//printf("DECRYPTED Turning: %i \n\r", Turning);
 						//printf("DECRYPTED Digital: %i \n\r", DecryptedFarmerCommands[3]);
 						switch ((DecryptedFarmerCommands[3] & DIGITAL_MASK)) {
 							case 0x00:
@@ -232,8 +253,8 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 								Brake = OFF;
 							break;
 						}
-						printf("DECRYPTED Peripheral: %i \n\r", Peripheral);
-						printf("DECRYPTED Brake: %i \n\r", Brake);
+						//printf("DECRYPTED Peripheral: %i \n\r", Peripheral);
+						//printf("DECRYPTED Brake: %i \n\r", Brake);
 						ActivateDirectionSpeed(DirectionSpeed, Turning);
 						ActivatePeripheral(Peripheral);
 						ActivateBrake(Brake);
@@ -242,14 +263,25 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						TransmitStatus();
 
 					} else {
+						printf("Reset the encryption key \n\r");
 						//reset encryption
 						TransmitResetEncryption();
 						//reset the encryption key
 						EncryptionKey_Index = 0;
-					}
+						
+						ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+					} 
 					
 					NextState = Paired;
-				}
+				} else if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
+																						&& ThisEvent.EventParam == LOST_COMM_TIMER)) {
+						printf("Lost Comm Timer Timeout \n\r");
+						DeactivateHover();
+						NextState = Waiting2Pair;
+						StopWagging();
+				} else {
+					NextState = Paired;
+				}					
 
     break;
 		
@@ -266,6 +298,14 @@ void StoreEncryptionKey(void) {
 	}
 }
 
+uint8_t GetHeader(void){
+	uint8_t localindex = EncryptionKey_Index;
+	uint8_t local_decrypted = 0; 
+	local_decrypted = EncryptionKey[localindex] ^ (*(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX));
+	return local_decrypted;
+}
+	
+
 void DecodeCommandMessage(void) {
 	for (int i = 0; i < FARMER_CMD_LENGTH; i++) {
 		DecryptedFarmerCommands[i] = EncryptionKey[EncryptionKey_Index] ^ (*(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i));
@@ -275,6 +315,20 @@ void DecodeCommandMessage(void) {
 			EncryptionKey_Index = 0;
 		}
 	}
+} 
+
+void InitDogTag(){
+		ADC_MultiInit(HowMany);
+		ADC_MultiRead(ADResults);
+		CurrentDogTagVal = ADResults[0];
+		CurrentDogTagVal = (uint8_t)((MaxVoltage*4095)/CurrentDogTagVal);
+		if(CurrentDogTagVal > 2000){
+			DogTag = 1;
+		}else if (CurrentDogTagVal > 1150 & CurrentDogTagVal < 1999){
+			DogTag = 2;
+		}else if (CurrentDogTagVal < 1150){
+			DogTag = 3;
+		}
 }
 
 void TransmitStatus(void) {
@@ -320,3 +374,10 @@ uint8_t GetPairedFarmerMSB (void) {
 	return PairedFarmer_MSB;
 }
 
+uint8_t GetDogTag(void){
+	return DogTag;
+}
+
+DOGState_t GetDOGState(void) {
+	return CurrentState;
+}

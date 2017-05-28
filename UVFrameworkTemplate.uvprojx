@@ -615,10 +615,16 @@
               <FileName>DogTail_Service.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\DogTail_Service.c</FilePath>
-
+            </File>
+            <File>
               <FileName>SPI.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\SPI.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADMulti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ADMulti.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -789,6 +795,11 @@
               <FileName>SPI.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\SPI.h</FilePath>
+            </File>
+            <File>
+              <FileName>ADMulti.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\ADMulti.h</FilePath>
             </File>
           </Files>
         </Group>

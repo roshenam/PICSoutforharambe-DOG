@@ -22,7 +22,7 @@
 
 
 /*----------------------------- Module Defines ----------------------------*/
-//#ifdef COMM_TEST_PRINTS
+#define COMM_TEST_PRINTS
 
 /*---------------------------- Module Functions ---------------------------*/
 uint8_t CalculateChecksum (uint8_t FrameLength);
@@ -121,10 +121,15 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 					  printf("RECEIVED A DATAPACKET (Comm_Service) \n\r");
 						#endif
 					  ES_Event NewEvent;
-						uint8_t PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
+					  uint8_t PacketType = 0;
+						DOGState_t CurrentState = GetDOGState();
+						if (CurrentState == Paired) {
+							PacketType = GetHeader();
+						} else {
+							PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
+						}
 						switch (PacketType) {
 							case FARMER_DOG_REQ_2_PAIR :
-<<<<<<< HEAD
 								printf("received REQ2PAIR\r\n");
 								NewEvent.EventType = ES_PAIR_REQUEST_RECEIVED;
 								break;
@@ -132,11 +137,15 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 								printf("received ENCR KEY \r\n");
 								NewEvent.EventType = ES_ENCRYPTION_KEY_RECEIVED;
 								break;
-							default :
+							case FARMER_DOG_CTRL:
 								printf("received CMD\r\n");
 								NewEvent.EventType = ES_NEW_CMD_RECEIVED;
 								break;
+							default:
+								printf("Alternative PacketType = %i \n\r", PacketType);
+								break;
 						}
+						printf("about to post to DOG SM \n\r");
 						NewEvent.EventParam = ThisEvent.EventParam; //the frame length
 						PostDOG_SM(NewEvent);
 					} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 
@@ -203,6 +212,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 							break;
 					}
 					
+					
 					//Add Unique Frame Length Data and Checksum
 		      //add the unique frame length
 					DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = DataFrameLength_Tx;
@@ -218,6 +228,8 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 					PostTransmit_SM(NewEvent);
     break;
 
+						default:
+							break;
 		
   }                                  // end switch on Current State
 
@@ -242,9 +254,10 @@ uint8_t CalculateChecksum (uint8_t FrameLength) {
 void ConstructIMUData (void) {
 	uint8_t DataPacketIndex = PACKET_TYPE_BYTE_INDEX_TX + 1;
 	for (int i = 0; i < IMU_DATA_NUM_BYTES; i++) {
-		DataPacket_Tx[DataPacketIndex + i] = 2; //*(IMU_Data + i);
+		DataPacket_Tx[DataPacketIndex + i] = *(IMU_Data + i);
 	}
 }
+
 
 /******GETTER FUNCTIONS************/
 uint8_t* GetDataPacket_Tx (void) {

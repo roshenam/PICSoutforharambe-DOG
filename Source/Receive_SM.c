@@ -24,7 +24,7 @@
 
 #define MAX_FRAME_LENGTH 40 // max number of bytes we expect to receive for any data type 
 
-//#define RECEIVE_TEST_PRINTS
+#define RECEIVE_TEST_PRINTS
 /*---------------------------- Module Functions ---------------------------*/
 
 

@@ -46,6 +46,7 @@
 #include "PWM_Module.h"
 
 #include "DogTail_Service.h"
+#include "ADMulti.h"
 
 
 /********************Module Defines*******************************************/

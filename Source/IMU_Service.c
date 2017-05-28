@@ -41,7 +41,7 @@
 #define HALF_SEC (ONE_SEC/2)
 #define TWO_SEC (ONE_SEC*2)
 #define FIVE_SEC (ONE_SEC*5)
-#define IMU_TIME HALF_SEC
+#define IMU_TIME 20 //ms
 
 #define CTRL9_XL  0x18 
 #define CTRL1_XL  0x10 
