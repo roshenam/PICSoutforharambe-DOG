@@ -611,6 +611,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\PWM_Module.c</FilePath>
             </File>
+            <File>
+              <FileName>DogTail_Service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\DogTail_Service.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

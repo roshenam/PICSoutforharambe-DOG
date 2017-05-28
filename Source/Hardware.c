@@ -104,7 +104,7 @@ void InitGPIOPins(void) {
 
 	//Output to PIC
 	InitPin (PIC_PORT, PIC_PIN, OUTPUT);
-	SetOutput (PIC_PORT, PIC_PIN, LO);
+	SetOutput (PIC_PORT, PIC_PIN, HI);
 		
 	//motor error flags
 	InitPin (MOTOR_PORT, MOTOR_LEFT_EF, INPUT);

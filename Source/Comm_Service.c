@@ -22,7 +22,7 @@
 
 
 /*----------------------------- Module Defines ----------------------------*/
-
+//#ifdef COMM_TEST_PRINTS
 
 /*---------------------------- Module Functions ---------------------------*/
 uint8_t CalculateChecksum (uint8_t FrameLength);
@@ -117,11 +117,14 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 			  DataPacket_Rx	= GetDataPacket();
 				uint8_t API_Ident = *(DataPacket_Rx + API_IDENT_BYTE_INDEX_RX);
 				if (API_Ident == API_IDENTIFIER_Rx) {
+					  #ifdef COMM_TEST_PRINTS
 					  printf("RECEIVED A DATAPACKET (Comm_Service) \n\r");
-						ES_Event NewEvent;
+						#endif
+					  ES_Event NewEvent;
 						uint8_t PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
 						switch (PacketType) {
 							case FARMER_DOG_REQ_2_PAIR :
+<<<<<<< HEAD
 								printf("received REQ2PAIR\r\n");
 								NewEvent.EventType = ES_PAIR_REQUEST_RECEIVED;
 								break;
@@ -137,7 +140,9 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 						NewEvent.EventParam = ThisEvent.EventParam; //the frame length
 						PostDOG_SM(NewEvent);
 					} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 
+						#ifdef COMM_TEST_PRINTS
 						printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service) \n\r");
+						#endif
 						uint8_t TxStatusResult = *(DataPacket_Rx + TX_STATUS_BYTE_INDEX);
 						if (TxStatusResult == SUCCESS) {
 							//do nothing
@@ -154,10 +159,14 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
     break;
 
     case ES_CONSTRUCT_DATAPACKET :
+			    #ifdef COMM_TEST_PRINTS
 					printf("--------------CONSTRUCTING-----------\n\r");
-					//Header Construction
+					#endif
+		      //Header Construction
+		      #ifdef COMM_TEST_PRINTS
 					printf("Constructing Datapacket (Comm_Service) \n\r");
-					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
+					#endif
+		      DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
 					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00; 
 					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
@@ -167,7 +176,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 					//Data Construction
 					switch (ThisEvent.EventParam) {
 						case DOG_ACK:
-							printf("Dog Ack Construction \n\r");
+							//printf("Dog Ack Construction \n\r");
 							//store the length of the data frame
 						  DataFrameLength_Tx = ACK_N_ENCRYPT_FRAME_LEN;
 							//add the packet type
@@ -175,7 +184,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 							//no extra data
 							break;
 						case DOG_FARMER_RESET_ENCR:
-							printf("Reset Encryption Construction \n\r");
+							//printf("Reset Encryption Construction \n\r");
 						  //store the length of the data frame
 						  DataFrameLength_Tx = ACK_N_ENCRYPT_FRAME_LEN;
 							//add the packet type
@@ -183,7 +192,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 							//no extra data
 							break;
 						case DOG_FARMER_REPORT:
-							printf("Dog Report Construction \n\r");
+							//printf("Dog Report Construction \n\r");
 						  //store the length of the data frame
 						  DataFrameLength_Tx = STATUS_FRAME_LEN;
 							//add the packet type
@@ -225,8 +234,8 @@ uint8_t CalculateChecksum (uint8_t FrameLength) {
 	}
 	Checksum = 0xFF - RunningSum;
 	
-	printf("Running sum: %i\r\n", RunningSum);
-	printf("Check sum: %i\r\n", Checksum);
+	//printf("Running sum: %i\r\n", RunningSum);
+	//printf("Check sum: %i\r\n", Checksum);
 	return Checksum;
 }
 

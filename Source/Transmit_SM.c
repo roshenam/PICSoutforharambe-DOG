@@ -33,6 +33,8 @@
 
 #define MAX_FRAME_LENGTH 40 // max number of bytes we expect to receive for any data type (including frame overhead)
 
+//#define XMIT_TEST_PRINTS
+
 
 /*---------------------------- Module Functions ---------------------------*/
 bool IsLastByte(void);
@@ -161,7 +163,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 				// send first byte of array 
 				uint8_t CurrentByte = *(DataToSend+index);
 				SendByte(CurrentByte);
-				//printf("START XMIT: %i\n\r", CurrentByte);
+				#ifdef XMIT_TEST_PRINTS
+				printf("START XMIT: %i\n\r", CurrentByte);
+				#endif
 
 				// increment index 
 				index++;
@@ -190,7 +194,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 			if ( ThisEvent.EventType == ES_BYTE_SENT) { // from UART ISR
 				// if index = length of array, we are done sending data
 				if (index == (DataPacketLength)) {
+					#ifdef XMIT_TEST_PRINTS
 					printf("SENT ALL BYTES \n\r");
+					#endif
 					// set LastByteFlag
 					LastByteFlag = 1;
 
@@ -203,7 +209,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-          //printf("XMIT DATA: %i\n\r", CurrentByte);
+					#ifdef XMIT_TEST_PRINTS
+					printf("XMIT DATA: %i\n\r", CurrentByte);
+					#endif
 					// increment index 
 					index++;
 

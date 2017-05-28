@@ -47,6 +47,7 @@ void CalculateRequestedDuties(uint8_t DifferentialCalculated, bool IsTurningLeft
 
 /*------------------------------ Module Code ------------------------------*/
 
+
 void ActivateHover(void) {
   ES_Event ThisEvent;
 	ThisEvent.EventType = ES_HOVER_ON;
@@ -65,14 +66,15 @@ void DeactivateHover(void) {
 	SetDuty(OFF, PWM_FORWARD_POL, MOTOR_RIGHT_PWM);
 }
 
-
 void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 	//find average duty and forward/reverse polarity
 	CalculateAverageDuty(DirectionSpeed);
+	printf("AverageDuty: %i      Polarity (0 is forward): %i \n\r", AverageDuty, Polarity);
+	
 	
 	//find duty differential between the two motors for turning action
-	uint8_t Differential;
-	
+	uint8_t Differential = 0;
+
 	if (Turning == 127) {
 		Differential = 0;
 		LeftDuty = AverageDuty;
@@ -81,12 +83,14 @@ void ActivateDirectionSpeed(uint8_t DirectionSpeed, uint8_t Turning) {
 		//max leftward control
 		Differential = ((Turning-127)*100) / (255-127);
 		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
-		CalculateRequestedDuties(Differential, true);
+		CalculateRequestedDuties(Differential, true); //boolean - true means turning left
 	} else { //turn right
-		Differential = AverageDuty = ((DirectionSpeed)*100) / (127);
+		Differential = ((Turning)*100) / (127);
 		Differential = (Differential/MAX_TURNING_DIFF_DIVISOR)/2;
-		CalculateRequestedDuties(Differential, false);
+		CalculateRequestedDuties(Differential, false); //boolean - false means turning right
 	}
+	
+	printf("Differential (max +/- 15): %i     RightDuty: %i     LeftDuty: %i\n\r", Differential, RightDuty, LeftDuty);
 	
 	//Set the duty and direction
 	SetDuty(LeftDuty, Polarity, MOTOR_LEFT_PWM);
@@ -122,37 +126,35 @@ void CalculateAverageDuty(uint8_t DirectionBit) {
 
 void CalculateRequestedDuties(uint8_t DifferentialCalculated, bool IsTurningLeft) {
 	if (IsTurningLeft == true) {
-		if (AverageDuty < DifferentialCalculated) {
-			LeftDuty = 0;
-		} else {
-			LeftDuty = AverageDuty - DifferentialCalculated;
-		}
-		
-		//calcaulate right differential
-		if (AverageDuty > DifferentialCalculated) {
-			RightDuty = 100;
-		} else {
-			RightDuty = AverageDuty + DifferentialCalculated;
-		}
+			if (AverageDuty < DifferentialCalculated) {
+				LeftDuty = 0;
+			} else {
+				LeftDuty = AverageDuty - DifferentialCalculated;
+			}
+			
+			//calcaulate right differential
+			if (AverageDuty > (100-DifferentialCalculated)) {
+				RightDuty = 100;
+			} else {
+				RightDuty = AverageDuty + DifferentialCalculated;
+			}
 	} else {
-		if (AverageDuty < DifferentialCalculated) {
-			RightDuty = 0;
-		} else {
-			RightDuty = AverageDuty - DifferentialCalculated;
-		}
-		
-		//calcaulate right differential
-		if (AverageDuty > DifferentialCalculated) {
-			LeftDuty = 100;
-		} else {
-			LeftDuty = AverageDuty + DifferentialCalculated;
-		}
+			if (AverageDuty < DifferentialCalculated) {
+				RightDuty = 0;
+			} else {
+				RightDuty = AverageDuty - DifferentialCalculated;
+			}
+			
+			//calcaulate right differential
+			if (AverageDuty > (100-DifferentialCalculated)) {
+				LeftDuty = 100;
+			} else {
+				LeftDuty = AverageDuty + DifferentialCalculated;
+			}
 	}	
 }
 
 
-
- 
 
 
 

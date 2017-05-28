@@ -24,7 +24,7 @@
 
 #define MAX_FRAME_LENGTH 40 // max number of bytes we expect to receive for any data type 
 
-
+//#define RECEIVE_TEST_PRINTS
 /*---------------------------- Module Functions ---------------------------*/
 
 
@@ -152,7 +152,9 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
 					printf("------------RECEIVING----------------------\n\r");
-					//printf("Start: %i\n\r", ThisEvent.EventParam);
+					#ifdef RECEIVE_TEST_PRINTS
+					printf("Start: %i\n\r", ThisEvent.EventParam);
+					#endif
 					// start timer 
 					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
 					
@@ -170,7 +172,9 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				//printf("MSB: %i\n\r", ThisEvent.EventParam);
+				#ifdef RECEIVE_TEST_PRINTS
+				printf("MSB: %i\n\r", ThisEvent.EventParam);
+				#endif
 				// store MSB in data packet 
 				MSBLength = ThisEvent.EventParam; 
 				// start receive timer
@@ -188,7 +192,9 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				//printf("LSB: %i\r\n", ThisEvent.EventParam);
+									#ifdef RECEIVE_TEST_PRINTS
+				printf("LSB: %i\r\n", ThisEvent.EventParam);
+				#endif
 				// store LSB in data packet 
 				LSBLength = ThisEvent.EventParam; 
 				
@@ -219,11 +225,14 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				//printf("Data: %i\n\r", ThisEvent.EventParam);
-
+				#ifdef RECEIVE_TEST_PRINTS
+				printf("Data: %i\n\r", ThisEvent.EventParam);
+				#endif
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
+										#ifdef RECEIVE_TEST_PRINTS
 					printf("CheckSum: %i\r\n", ThisEvent.EventParam);
+					#endif
 					if (ThisEvent.EventParam == (0xFF - RunningSum)) {
 						//printf("Checksum is good: ReceiveSM");
 						// if good checksum, post PacketReceived event to FARMER_SM

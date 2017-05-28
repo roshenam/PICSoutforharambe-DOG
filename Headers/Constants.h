@@ -99,8 +99,8 @@
 #define PWM_FORWARD_POL						0
 #define PWM_REVERSE_POL						1
 
-#define SERVO_MAX_PULSE						2000 // uS
-#define SERVO_MIN_PULSE						1000 // uS
+#define SERVO_MAX_PULSE						2 // mS
+#define SERVO_MIN_PULSE						1 // mS
 
 #define MAX_TURNING_DIFF_DIVISOR	3 //100/MAX --> DIVISOR
 
@@ -110,6 +110,7 @@
 #define GAME_TIME									218*ONE_SEC
 #define INTER_MESSAGE_TIME				300	// FARMER transmits a packet every 300 ms 
 #define LOST_COMM_TIME						ONE_SEC // DOG+FARMER unpair if no message received after 1 second
+#define WAG_TIME									ONE_SEC
 
 //Interrupts
 #define PRIORITY_0 								0

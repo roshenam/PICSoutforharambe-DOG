@@ -39,6 +39,7 @@ int main(void)
 	printf("------------------------MAPKEYS--------------------------------\n\r");
 	printf("D: Send a DOG ACK \n\r");
 	printf("S: Unpair & Stop Hovering \n\r");
+	printf("P: PWM TEST \n\r");
 	printf("---------------------------------------------------------------\n\r");
 	printf("\n\r");
 

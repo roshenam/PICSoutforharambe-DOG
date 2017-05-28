@@ -30,6 +30,8 @@ void TransmitStatus(void);
 void DecodeCommandMessage(void);
 void TransmitAck(void);
 void TransmitResetEncryption(void);
+void StopWagging(void);
+void StartWagging(void);
 
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -139,9 +141,10 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 
 	if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
 																						&& ThisEvent.EventParam == LOST_COMM_TIMER)) {
+	  printf("Lost Comm Timer Timeout \n\r");
 		DeactivateHover();
 		NextState = Waiting2Pair;
-		//Stop Tail Wag Service!!
+		StopWagging();
 	} 
 	
   switch ( CurrentState )
@@ -150,6 +153,9 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 			
 				//initialize encryption key index
 				EncryptionKey_Index = 0;
+		
+		   //stop wagging
+				StopWagging();
 		
 				if (ThisEvent.EventType == ES_PAIR_REQUEST_RECEIVED) {
           DataPacket_Rx = GetDataPacket();
@@ -163,7 +169,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
             
             //turn the Lift Fan On
             ActivateHover();
-						
+												
 						//start the lost-communications timer for 1s
 						ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 						
@@ -183,6 +189,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 					TransmitStatus();
 					
 					//Start Tail Wag Service!!
+					StartWagging();
 					
 					NextState = Paired;
 				}      
@@ -227,8 +234,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						}
 						printf("DECRYPTED Peripheral: %i \n\r", Peripheral);
 						printf("DECRYPTED Brake: %i \n\r", Brake);
-						ActivateDirectionSpeed(DirectionSpeed);
-						ActivateTurning(Turning);
+						ActivateDirectionSpeed(DirectionSpeed, Turning);
 						ActivatePeripheral(Peripheral);
 						ActivateBrake(Brake);
 						
@@ -291,6 +297,18 @@ void TransmitResetEncryption(void) {
 		NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
 		NewEvent.EventParam = DOG_FARMER_RESET_ENCR;
 		PostComm_Service(NewEvent); //add back in when included
+}
+
+void StopWagging(void) {
+	  ES_Event NewEvent;
+		NewEvent.EventType = ES_STOP_WAGGING;
+		PostDogTail_Service(NewEvent); //add back in when included
+}
+
+void StartWagging(void) {
+	  ES_Event NewEvent;
+		NewEvent.EventType = ES_START_WAGGING;
+		PostDogTail_Service(NewEvent); //add back in when included
 }
 
 /*******Getters************/

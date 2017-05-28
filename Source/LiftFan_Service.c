@@ -70,8 +70,6 @@
 /*---------------------------- Module Variables ---------------------------*/
 // with the introduction of Gen2, we need a module level Priority variable
 static uint8_t MyPriority;
-// add a deferral queue for up to 3 pending deferrals +1 to allow for ovehead
-static ES_Event DeferralQueue[3+1];
 
 static uint32_t DataCounter;
 static bool LiftFan_State = false; //true = on
@@ -98,9 +96,7 @@ bool InitLiftFan_Service ( uint8_t Priority )
 {
   
   MyPriority = Priority;
-  
-  ES_InitDeferralQueueWith( DeferralQueue, ARRAY_SIZE(DeferralQueue) );
-	
+  	
 	ES_ShortTimerInit(MyPriority, MyPriority);
 	
   return true;
@@ -193,6 +189,12 @@ ES_Event RunLiftFan_Service( ES_Event ThisEvent )
 					case 2:
 						//stop bit
 						SetOutput(PIC_PORT, PIC_PIN, LO);
+					  ES_ShortTimerStart(TIMER_A, BIT_TIME);
+
+					break;
+					
+					case 3:
+						SetOutput(PIC_PORT, PIC_PIN, HI);
 					break;
 				}
 				DataCounter++;

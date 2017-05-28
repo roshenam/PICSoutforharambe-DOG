@@ -30,7 +30,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 7
+#define NUM_SERVICES 8
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -134,11 +134,11 @@
 // These are the definitions for Service 7
 #if NUM_SERVICES > 7
 // the header file with the public function prototypes
-#define SERV_7_HEADER "TestHarnessService7.h"
+#define SERV_7_HEADER "DogTail_Service.h"
 // the name of the Init function
-#define SERV_7_INIT InitTestHarnessService7
+#define SERV_7_INIT InitDogTail_Service
 // the name of the run function
-#define SERV_7_RUN RunTestHarnessService7
+#define SERV_7_RUN RunDogTail_Service
 // How big should this services Queue be?
 #define SERV_7_QUEUE_SIZE 3
 #endif
@@ -268,7 +268,8 @@ typedef enum {  ES_NO_EVENT = 0,
 								//Transmit_SM
 								ES_START_XMIT, ES_BYTE_SENT,
 								// Hover
-								ES_HOVER_ON, ES_HOVER_OFF
+								ES_HOVER_ON, ES_HOVER_OFF,
+								ES_STOP_WAGGING, ES_START_WAGGING
 } ES_EventTyp_t ;
 
 /****************************************************************************/
@@ -320,7 +321,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TIMER1_RESP_FUNC PostDOG_SM
 #define TIMER2_RESP_FUNC PostTransmit_SM
 #define TIMER3_RESP_FUNC PostDOG_SM
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER4_RESP_FUNC PostDogTail_Service
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -344,6 +345,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define GameTimer 1
 #define TRANSMIT_TIMER 2
 #define LOST_COMM_TIMER 3
+#define WAG_TIMER	4
 
 
 #endif /* CONFIGURE_H */

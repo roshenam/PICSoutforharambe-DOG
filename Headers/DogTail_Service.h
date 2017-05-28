@@ -1,27 +1,22 @@
 /****************************************************************************
  
-  Header file for IMU Service
+  Header file for DogTail_Service
   based on the Gen 2 Events and Services Framework
 
  ****************************************************************************/
 
-#ifndef IMU_Service_H
-#define IMU_Service_H
+#ifndef DogTail_Service_H
+#define DogTail_Service_H
 
 #include "ES_Configure.h"
 #include "ES_Types.h"
+#include "ES_Events.h"
 
 // Public Function Prototypes
 
-bool InitIMU_Service ( uint8_t Priority );
-bool PostIMU_Service( ES_Event ThisEvent );
-ES_Event RunIMU_Service( ES_Event ThisEvent );
+bool InitDogTail_Service ( uint8_t Priority );
+bool PostDogTail_Service( ES_Event ThisEvent );
+ES_Event RunDogTail_Service( ES_Event ThisEvent );
 
-
-/***GETTER****/
-uint8_t* GetIMU_Data(void);
-
-
-
-#endif /* IMU_Service_H */
+#endif /* DogTail_Service_H */
 
