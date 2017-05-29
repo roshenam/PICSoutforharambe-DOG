@@ -67,11 +67,11 @@
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public function prototypes
-#define SERV_2_HEADER "DOG_SM.h"
+#define SERV_2_HEADER "Comm_Service.h"
 // the name of the Init function
-#define SERV_2_INIT InitDOG_SM
+#define SERV_2_INIT InitComm_Service
 // the name of the run function
-#define SERV_2_RUN RunDOG_SM
+#define SERV_2_RUN RunComm_Service
 // How big should this services Queue be?
 #define SERV_2_QUEUE_SIZE 3
 #endif
@@ -95,11 +95,11 @@
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public function prototypes
-#define SERV_4_HEADER "Comm_Service.h"
+#define SERV_4_HEADER "DOG_SM.h"
 // the name of the Init function
-#define SERV_4_INIT InitComm_Service
+#define SERV_4_INIT InitDOG_SM
 // the name of the run function
-#define SERV_4_RUN RunComm_Service
+#define SERV_4_RUN RunDOG_SM
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 3
 #endif

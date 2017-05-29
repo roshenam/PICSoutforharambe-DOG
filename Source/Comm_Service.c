@@ -19,7 +19,7 @@
 
 #include "Hardware.h"
 #include "Constants.h"
-
+#include "UART.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define COMM_TEST_PRINTS
@@ -34,8 +34,8 @@ static uint8_t MyPriority;
 static uint8_t* DataPacket_Rx;
 static uint8_t DataPacket_Tx[MAX_PACKET_LENGTH];
 static uint8_t DataFrameLength_Tx;
-
-
+static uint8_t API_Ident;
+static ES_Event DeferralQueue[3+1];
 
 static uint8_t* IMU_Data;
 
@@ -60,9 +60,9 @@ static uint8_t* IMU_Data;
 ****************************************************************************/
 bool InitComm_Service( uint8_t Priority )
 {
-
+  ES_InitDeferralQueueWith(DeferralQueue,3+1	);
   MyPriority = Priority;
-
+	API_Ident = 0;
   return true;
 }
 
@@ -110,16 +110,23 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
 	
+  if (ThisEvent.EventType == ES_DATAPACKET_RECEIVED) {
+		printf("received a datapacket received in comm service \n\r");
+	} else {
+		printf("received a datapacket construct in comm service \r\n");
+	}		
 
   switch ( ThisEvent.EventType )
   {
     case ES_DATAPACKET_RECEIVED  : 
+			
 			  DataPacket_Rx	= GetDataPacket();
-				uint8_t API_Ident = *(DataPacket_Rx + API_IDENT_BYTE_INDEX_RX);
+				for (int i = 0; i < 5; i++) {
+					printf("%i \n\r", *(DataPacket_Rx + i));
+				}
+				API_Ident = GetAPIIdentifier(); //API_IDENT_BYTE_INDEX_RX);
+		    printf("datapacket received in comm service: %i \n\r", API_Ident);
 				if (API_Ident == API_IDENTIFIER_Rx) {
-					  #ifdef COMM_TEST_PRINTS
-					  printf("RECEIVED A DATAPACKET (Comm_Service) \n\r");
-						#endif
 					  ES_Event NewEvent;
 					  uint8_t PacketType = 0;
 						DOGState_t CurrentState = GetDOGState();
@@ -128,6 +135,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 						} else {
 							PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
 						}
+						printf("RECEIVED A DATAPACKET (Comm_Service): %i \n\r", PacketType);
 						switch (PacketType) {
 							case FARMER_DOG_REQ_2_PAIR :
 								printf("received REQ2PAIR\r\n");
@@ -143,9 +151,13 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 								break;
 							default:
 								printf("Alternative PacketType = %i \n\r", PacketType);
+								printf("Ask to Reset Encryption Key \n\r");
+								TransmitResetEncryption();
+							  ResetEncryptionKeyIndex();
+							  ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 								break;
 						}
-						printf("about to post to DOG SM \n\r");
+						//printf("about to post to DOG SM \n\r");
 						NewEvent.EventParam = ThisEvent.EventParam; //the frame length
 						PostDOG_SM(NewEvent);
 					} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 

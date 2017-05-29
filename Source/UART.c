@@ -32,13 +32,31 @@
 #include "Hardware.h"
 #include "Transmit_SM.h"
 #include "Receive_SM.h"
+#include "UART.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 // UART7 Rx: PE0
 // UART7 Tx: PE1
+#define RECEIVE_TIMER_LENGTH 10 // based off of 9600 baud rate (each character takes ~1.04ms to send)
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t DataByte; 
+static UARTReceiveState_t CurrentState;
+static uint8_t LocalDataPacket[MAX_PACKET_LENGTH];
+static uint8_t ReadyDataPacket[MAX_PACKET_LENGTH];
+
+static uint8_t MSBLength = 0;
+static uint8_t LSBLength = 0;
+static uint8_t FrameLength = 0; // num bytes in data frame
+static uint8_t BytesLeft = 0;
+static uint8_t RunningSum = 0;
+static uint8_t ArrayIndex_UART = 0;
+
+static uint8_t API_Identifier = 0;
+
+/*---------------------------- Module Function ---------------------------*/
+static void ProcessByte(uint8_t DataByte);
+static void CopyDataPacket(void);
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -104,7 +122,8 @@ void InitUART(void) {
 	
 	// globally enable interrupts 
 	__enable_irq();
-
+	
+	printf("UART init \r\n");
 } 
 
 /****************************************************************************
@@ -119,25 +138,31 @@ void InitUART(void) {
 ****************************************************************************/
 
  void UART_ISR(void) {
-	 //printf("In the UART ISR: UART.c \n\r");
+	//printf("isr \r\n");
 	// read UARTMIS
     // if RXMIS set:
  	if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
+		//printf("r \r\n");
 		// save new data byte
 		DataByte = HWREG(UART7_BASE + UART_O_DR); 
 
 		// clear interrupt flag (set RXIC in UARTICR)
 		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_RXIC;
 
+		/*
 		// post ByteReceived event to Receive_SM (event param is byte in UARTDR) 
 		ES_Event ThisEvent;
 		ThisEvent.EventType = ES_BYTE_RECEIVED;
 		ThisEvent.EventParam = DataByte;
-		PostReceive_SM(ThisEvent);
+		PostReceive_SM(ThisEvent);*/
+		
+		ProcessByte(DataByte);
+		
  	}
 
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 
 	else if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_TXMIS) == UART_MIS_TXMIS) {
+		//printf("t \r\n");
 	// should get this interrupt for all bytes AFTER the start byte (0x7E) 
 		//printf("TXMIS INTERRUPT \n\r");
 		// clear interrupt flag 
@@ -157,8 +182,145 @@ void InitUART(void) {
 	}
 }
 
+static void ProcessByte(uint8_t DataByte) {
+	
+	switch (CurrentState) {
+	case Wait4Start: 
+				
+				// check if byte received is 0x7E 
+				if ( DataByte == START_DELIMITER ) {
+					printf("-R- \r\n");
+					//printf("start byte received\r\n");
+					// start timer 
+					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
+					
+					// set current state to Wait4MSB
+					CurrentState = Wait4MSBLength;
+				}
+      
+    break;
 
+		case Wait4MSBLength:      
+			
+				// store MSB in data packet 
+				MSBLength = DataByte; 
+				// start receive timer
+				ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
+				// set current state to Wait4LSB
+				CurrentState = Wait4LSBLength;
+			
+		
+    break;
+		
+		case Wait4LSBLength: 
 
+				// store LSB in data packet 
+				LSBLength = DataByte; 
+				
+				// update FrameLength and BytesLeft
+				FrameLength = MSBLength + LSBLength;
+				BytesLeft = FrameLength;
+				
+				// start receive timer
+				ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
+				
+				// set ArrayIndex to 0 
+				ArrayIndex_UART = 0;
+				
+				// initialize runningsum to 0
+				RunningSum = 0;
+				
+				// set current state to ReceivingData
+				CurrentState = ReceivingData;
+				
+      
+    break;
+		
+		case ReceivingData: 
 
+				// if BytesLeft = 0, then we just received the checksum 
+				if (BytesLeft == 0) {
 
+					if (DataByte == (0xFF - RunningSum)) {
+						//printf("Checksum is good: ReceiveSM");
+						
+						/*
+						uint8_t Header = LocalPacket[INDEX];
+						if (Header == ENCRY) {
+							CopyDataPacketToEncryptionArray();
+						} else {
+							CopyDataPacket();
+						}
+						
+						
+						*/
+						// copy local data packet into ready data packet
+						//CopyDataPacket();
+						
+						// if good checksum, post PacketReceived event to FARMER_SM
+						ES_Event ThisEvent;         
+						ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
+						ThisEvent.EventParam = FrameLength; 
+						PostComm_Service(ThisEvent);
+						//printf("event posted \n\r");
+					} else {
+						// if bad checksum, don't do anything
+					}
+					
+					// go back to Wait4Start
+					CurrentState = Wait4Start;
+				} else {
 
+					// else if BytesLeft > 0, then we're still receiving data bytes
+					// store current data byte 
+					//uint8_t CurrentByte = DataByte;
+					
+					// add byte to DataPacket
+					LocalDataPacket[ArrayIndex_UART] = DataByte;
+					
+					if (ArrayIndex_UART == 0) {
+						API_Identifier = DataByte;
+						printf("API_Ident: %i \n\r", API_Identifier);
+					}
+								//printf("%i: %i\r\n", ArrayIndex, DataByte);
+					//printf("LDP: %i \n\r", LocalDataPacket[0]);
+					//}
+					// increment ArrayIndex
+					ArrayIndex_UART++;
+					
+					// update check sum
+					RunningSum += DataByte;
+					
+					// decrement Bytes left 
+					BytesLeft--;
+					
+					//printf("bytes left: %i\r\n", BytesLeft);
+					
+					// start receive timer 
+					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
+				
+			}
+      
+    break;
+		}
+}
+
+uint8_t* GetDataPacket (void) {
+	return &LocalDataPacket[0];
+}
+
+uint8_t GetAPIIdentifier(void) {
+	return API_Identifier;
+}
+
+void SetUARTState(void) {
+	CurrentState = Wait4Start;
+}
+
+static void CopyDataPacket(void) {
+	for (int i = 0; i < MAX_PACKET_LENGTH; i++) {
+		ReadyDataPacket[i] = LocalDataPacket[i];
+	}
+			printf("LocalDataPacket: %i      ReadyDataPacket: %i \n\r", LocalDataPacket[0], ReadyDataPacket[0]);
+
+}

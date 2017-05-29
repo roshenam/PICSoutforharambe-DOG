@@ -12,6 +12,8 @@ bool InitDOG_SM ( uint8_t Priority );
 bool PostDOG_SM( ES_Event ThisEvent );
 ES_Event RunDOG_SM( ES_Event ThisEvent );
 uint8_t GetHeader(void);
+void ResetEncryptionKeyIndex(void);
+void TransmitResetEncryption(void);
 
 /***getters**/
 uint8_t GetPairedFarmerLSB (void);

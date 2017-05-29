@@ -17,12 +17,13 @@
 
 #include "Hardware.h"
 #include "Constants.h"
+#include "UART.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 
 #define RECEIVE_TIMER_LENGTH 10 // based off of 9600 baud rate (each character takes ~1.04ms to send)
 
-#define MAX_FRAME_LENGTH 40 // max number of bytes we expect to receive for any data type 
+//#define MAX_FRAME_LENGTH 40 // max number of bytes we expect to receive for any data type 
 
 #define RECEIVE_TEST_PRINTS
 /*---------------------------- Module Functions ---------------------------*/
@@ -32,7 +33,7 @@
 static ReceiveState_t CurrentState;
 
 static uint8_t MyPriority;
-
+/*
 static uint8_t MSBLength = 0;
 static uint8_t LSBLength = 0;
 static uint8_t FrameLength = 0; // num bytes in data frame
@@ -43,7 +44,7 @@ static uint8_t DataPacket[MAX_PACKET_LENGTH]; // array containing all bytes in d
 static uint8_t ArrayIndex = 0;
 
 static uint8_t *outgoingDataPacket; //pointer to data packet
-
+*/
 
 
 /*------------------------------ Module Code ------------------------------*/
@@ -70,21 +71,15 @@ bool InitReceive_SM ( uint8_t Priority )
   ES_Event ThisEvent;
 
   MyPriority = Priority;
-  // put us into the Initial PseudoState
-  CurrentState = InitReceive;
+  
+	CurrentState = InitReceive;
 	
-	outgoingDataPacket = &DataPacket[0]; // address of first entry in data packet array
+	ThisEvent.EventType = ES_INIT;
+	PostReceive_SM(ThisEvent);
 	
-  // post the initial transition event
-  ThisEvent.EventType = ES_INIT;
-	//printf("Initialized in Receive_SM\r\n");
-  if (ES_PostToService( MyPriority, ThisEvent) == true)
-  {
-      return true;
-  }else
-  {
-      return false;
-  }
+	//InitUART();
+	//SetUARTState();
+	return true;
 }
 
 /****************************************************************************
@@ -130,7 +125,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 {
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
-
+	
+	
   switch ( CurrentState )
   {
     case InitReceive :       
@@ -139,13 +135,22 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
             // initialize UART
 						InitUART();
 
-						outgoingDataPacket = &DataPacket[0];
+						SetUARTState();
 					
             // set current state to Wait4Start 
-            CurrentState = Wait4Start;
+            CurrentState = RunReceive;
          }
     break;
-
+				 
+		case RunReceive :       
+			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == RECEIVE_TIMER ) {
+					// go back to Wait4Start
+					SetUARTState();
+				//printf("receive timeout\r\n");
+			}
+    break;
+	}	 
+/*
     case Wait4Start:      
 			// waiting to receive 0x7E 
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
@@ -276,8 +281,11 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
     default :
       ;
   }                                   // end switch on Current State
+	
+	*/
   return ReturnEvent;
 }
+
 
 /****************************************************************************
  Function
@@ -292,8 +300,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
  Author
    Sarah Cabreros
 ****************************************************************************/
-uint8_t* GetDataPacket(void) {
+/*uint8_t* GetDataPacket(void) {
 	return outgoingDataPacket;
 }
 
-
+*/

@@ -66,7 +66,7 @@
 /* prototypes for private functions for this service.They should be functions
    relevant to the behavior of this service
 */
-static void Init_IMUhardware( void );
+//static void Init_IMUhardware( void );
 
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -74,7 +74,7 @@ static void Init_IMUhardware( void );
 static uint8_t MyPriority;
 
 static uint8_t IMUData[IMU_DATA_NUM_BYTES]; // array containing all bytes in IMU packet
-static uint8_t ArrayIndex = 0;
+//static uint8_t ArrayIndex = 0;
 static uint8_t *outgoingDataPacket; //pointer to data packet
 static IMUState_t CurrentState;
 static uint8_t Init_Bytes[8] = {(CTRL9_XL), 0x38, (CTRL1_XL), 0x60,
@@ -237,7 +237,7 @@ uint8_t* GetIMU_Data(void) {
 /***************************************************************************
  private functions
  ***************************************************************************/
-static void Init_IMUhardware( void ){
+/*static void Init_IMUhardware( void ){
 	Write2IMU( (CTRL9_XL<<1) );
 	Write2IMU( 0x38 );
 	Write2IMU( (CTRL1_XL<<1) );
@@ -247,7 +247,7 @@ static void Init_IMUhardware( void ){
 	Write2IMU( (CTRL2_G<<1) );
 	Write2IMU( 0x60 );
 }
-
+*/
 
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/

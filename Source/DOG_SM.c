@@ -29,7 +29,7 @@
 void StoreEncryptionKey(void);
 void TransmitStatus(void);
 void TransmitAck(void);
-void TransmitResetEncryption(void);
+//void TransmitResetEncryption(void);
 void StopWagging(void);
 void StartWagging(void);
 void InitDogTag(void);
@@ -82,7 +82,7 @@ bool InitDOG_SM ( uint8_t Priority )
 {
   //ES_Event ThisEvent;
 
-  MyPriority = Priority;
+  MyPriority =  Priority;
 	
   // put us into the Initial PseudoState
   CurrentState = Waiting2Pair;
@@ -223,9 +223,8 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 					ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
           //decode
 					DecodeCommandMessage();
-					
-					if (DecryptedFarmerCommands[0] == FARMER_DOG_CTRL) {
-						//executed commands as required
+				
+					//executed commands as required
 						DirectionSpeed = DecryptedFarmerCommands[1];
 						//printf("DECRYPTED Direction/Speed: %i \n\r", DirectionSpeed);
 						Turning = DecryptedFarmerCommands[2];
@@ -261,7 +260,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						
 						//tranmsit status message
 						TransmitStatus();
-
+/*
 					} else {
 						printf("Reset the encryption key \n\r");
 						//reset encryption
@@ -270,7 +269,7 @@ ES_Event RunDOG_SM( ES_Event ThisEvent )
 						EncryptionKey_Index = 0;
 						
 						ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
-					} 
+					} */
 					
 					NextState = Paired;
 				} else if ((ThisEvent.EventType == ES_UNPAIR) || (ThisEvent.EventType == ES_TIMEOUT 
@@ -351,6 +350,10 @@ void TransmitResetEncryption(void) {
 		NewEvent.EventType = ES_CONSTRUCT_DATAPACKET;
 		NewEvent.EventParam = DOG_FARMER_RESET_ENCR;
 		PostComm_Service(NewEvent); //add back in when included
+}
+
+void ResetEncryptionKeyIndex(void) {
+	EncryptionKey_Index	= 0;
 }
 
 void StopWagging(void) {
