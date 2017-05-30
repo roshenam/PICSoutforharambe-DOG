@@ -74,8 +74,8 @@
 
 //Port E
 
-#define RX_PIN	BIT0HI 	// UART7 Rx: PE0
-#define TX_PIN	BIT1HI	// UART7 Tx: PE1
+#define RX_PIN	BIT4HI 	// UART4 Rx: PC4
+#define TX_PIN	BIT5HI	// UART4 Tx: PC5
 
 #define SERVO_PORT				GPIO_PORTE_BASE
 #define SERVO_PIN					GPIO_PIN_4

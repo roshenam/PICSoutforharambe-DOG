@@ -22,8 +22,6 @@
 #include "DOG_SM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
-#define	DOG_TAG GPIO_PIN_3
-#define HowMany 1
 
 /*---------------------------- Module Functions ---------------------------*/
 void StoreEncryptionKey(void);
@@ -88,9 +86,9 @@ bool InitDOG_SM ( uint8_t Priority )
   CurrentState = Waiting2Pair;
 
 //GET DOG TAG NUMBER
-	InitDogTag();
-	DogTag = GetDogTag();
-	DogTag = 3;
+	//InitDogTag();
+	//DogTag = GetDogTag();
+	DogTag = 39;
 	printf("DOGTAG#: %i \n\r", DogTag);	
 	InitAll(); //initialize all hardware (ports, pins, interrupts)
 	
@@ -317,15 +315,15 @@ void DecodeCommandMessage(void) {
 } 
 
 void InitDogTag(){
-		ADC_MultiInit(HowMany);
+		ADC_MultiInit(1); // initializes PE0 as analog input 
 		ADC_MultiRead(ADResults);
 		CurrentDogTagVal = ADResults[0];
-		CurrentDogTagVal = (uint8_t)((MaxVoltage*4095)/CurrentDogTagVal);
-		if(CurrentDogTagVal > 2000){
+		//printf("analog: %i\r\n",CurrentDogTagVal);
+		if(CurrentDogTagVal < 2100){
 			DogTag = 1;
-		}else if (CurrentDogTagVal > 1150 & CurrentDogTagVal < 1999){
+		}else if (CurrentDogTagVal > 2100 & CurrentDogTagVal < 2800){
 			DogTag = 2;
-		}else if (CurrentDogTagVal < 1150){
+		}else if (CurrentDogTagVal > 2800){
 			DogTag = 3;
 		}
 }

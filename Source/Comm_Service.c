@@ -109,21 +109,21 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 {
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
-	
+	/*
   if (ThisEvent.EventType == ES_DATAPACKET_RECEIVED) {
 		printf("received a datapacket received in comm service \n\r");
 	} else {
 		printf("received a datapacket construct in comm service \r\n");
-	}		
+	}	*/	
 
   switch ( ThisEvent.EventType )
   {
     case ES_DATAPACKET_RECEIVED  : 
 			
 			  DataPacket_Rx	= GetDataPacket();
-				for (int i = 0; i < 5; i++) {
+				/*for (int i = 0; i < 5; i++) {
 					printf("%i \n\r", *(DataPacket_Rx + i));
-				}
+				}*/
 				API_Ident = GetAPIIdentifier(); //API_IDENT_BYTE_INDEX_RX);
 		    printf("datapacket received in comm service: %i \n\r", API_Ident);
 				if (API_Ident == API_IDENTIFIER_Rx) {
@@ -172,7 +172,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 							ES_Event NewEvent;
 							NewEvent.EventType = ES_START_XMIT;
 							NewEvent.EventParam = DataFrameLength_Tx;
-							PostComm_Service(NewEvent);
+							PostTransmit_SM(NewEvent);
 						}
 					} else if (API_Ident == API_IDENTIFIER_Reset) {
 						printf("Hardware Reset Status Message \n\r");

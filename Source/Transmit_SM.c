@@ -171,7 +171,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 				index++;
 
 				// enable TXIM interrupts
-				HWREG(UART7_BASE + UART_O_IM) |= UART_IM_TXIM; 
+				HWREG(UART4_BASE + UART_O_IM) |= UART_IM_TXIM; 
 
 				// start timer 
 				ES_Timer_InitTimer(TRANSMIT_TIMER, TRANSMIT_TIMER_LENGTH);
@@ -231,9 +231,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 
 static void SendByte(uint8_t DataByte) {
 	// Check if room in FIFO
-	if((HWREG(UART7_BASE + UART_O_FR)&UART_FR_TXFE) != 0){
+	if((HWREG(UART4_BASE + UART_O_FR)&UART_FR_TXFE) != 0){
 		// write data to DR 
-		HWREG(UART7_BASE + UART_O_DR) = DataByte; 
+		HWREG(UART4_BASE + UART_O_DR) = DataByte; 
 	}else{
 		printf("Fifo not empty: Transmit_SM \r\n");
 	}	

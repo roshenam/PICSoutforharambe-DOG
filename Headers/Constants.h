@@ -109,7 +109,7 @@
 #define ONE_SEC										976
 #define GAME_TIME									218*ONE_SEC
 #define INTER_MESSAGE_TIME				300	// FARMER transmits a packet every 300 ms 
-#define LOST_COMM_TIME						ONE_SEC // DOG+FARMER unpair if no message received after 1 second
+#define LOST_COMM_TIME						3*ONE_SEC // DOG+FARMER unpair if no message received after 1 second
 #define WAG_TIME									ONE_SEC
 
 //Interrupts

@@ -168,10 +168,10 @@ __Vectors
         DCD     IntDefaultHandler           ; SSI2 Rx and Tx
         DCD     IntDefaultHandler           ; SSI3 Rx and Tx
         DCD     IntDefaultHandler           ; UART3 Rx and Tx
-        DCD     IntDefaultHandler           ; UART4 Rx and Tx
+        DCD     UART_ISR    	            ; UART4 Rx and Tx
         DCD     IntDefaultHandler           ; UART5 Rx and Tx
         DCD     IntDefaultHandler           ; UART6 Rx and Tx
-        DCD     UART_ISR           			; UART7 Rx and Tx
+        DCD     IntDefaultHandler        	; UART7 Rx and Tx
         DCD     0                           ; Reserved
         DCD     0                           ; Reserved
         DCD     0                           ; Reserved
